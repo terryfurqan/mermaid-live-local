@@ -55,6 +55,7 @@
     font-weight: 600;
     font-size: 14px;
     color: #fff;
+    white-space: nowrap;
   }
   .brand-logo {
     width: 26px;
@@ -66,6 +67,7 @@
     justify-content: center;
     color: #fff;
     font-size: 13px;
+    flex-shrink: 0;
   }
   .airgap-badge {
     display: inline-flex;
@@ -78,6 +80,7 @@
     background: rgba(46, 204, 113, 0.12);
     color: #2ecc71;
     border: 1px solid rgba(46, 204, 113, 0.35);
+    white-space: nowrap;
   }
 
   .top-actions {
@@ -93,6 +96,7 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 3px 8px;
+    white-space: nowrap;
   }
   .ctrl-group label {
     color: var(--text-muted);
@@ -109,6 +113,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
     transition: background 0.15s, border-color 0.15s;
   }
   .ctrl-group select {
@@ -1134,10 +1139,14 @@
 
   window.addEventListener('resize', () => pz?.resize());
 
-  // Initial load
+  // Initial load (wait for local FontAwesome webfonts so icon widths are measured accurately)
   editor.value = mermaidCode;
   updateLineNumbers();
-  renderDiagram(false);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => renderDiagram(false));
+  } else {
+    renderDiagram(false);
+  }
 </script>
 </body>
 </html>

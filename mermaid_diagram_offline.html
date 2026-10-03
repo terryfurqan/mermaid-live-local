@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Strict Air-Gapped Content Security Policy: Memblokir 100% koneksi jaringan keluar (connect-src 'none') & resource eksternal -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; form-action 'none'; base-uri 'self';">
+<title>Mermaid Live Editor — 100% Offline (Air-Gapped)</title>
+<link rel="stylesheet" href="./assets/css/fontawesome.min.css">
+<script src="./assets/js/mermaid.min.js"></script>
+<script src="./assets/js/svg-pan-zoom.min.js"></script>
+<script src="./assets/js/pako.min.js"></script>
+<style>
+  :root {
+    --bg-app: #141417;
+    --bg-header: #1c1c21;
+    --bg-panel: #1e1e24;
+    --bg-editor: #18181c;
+    --bg-gutter: #141418;
+    --bg-canvas: #1b1b1f;
+    --border: #2e2e38;
+    --text-main: #e6e6ef;
+    --text-muted: #8b8b9e;
+    --accent: #ff3670;
+    --accent-hover: #ff5286;
+    --accent-soft: rgba(255, 54, 112, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-app);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    font-size: 13px;
+  }
+
+  /* Top Navbar */
+  #topbar {
+    height: 48px;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    user-select: none;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #fff;
+  }
+  .brand-logo {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #ff3670, #ff7a45);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+  }
+  .airgap-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: rgba(46, 204, 113, 0.12);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.35);
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #25252d;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+  }
+  .ctrl-group label {
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+  select, .btn {
+    background: #25252d;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .ctrl-group select {
+    border: none;
+    padding: 2px 4px;
+    background: transparent;
+    outline: none;
+  }
+  .btn:hover, select:hover { background: #30303b; }
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+
+  /* Workspace Split Layout */
+  #workspace {
+    display: flex;
+    width: 100vw;
+    height: calc(100vh - 48px);
+    overflow: hidden;
+  }
+
+  /* Left Editor Pane */
+  #left-pane {
+    width: 440px;
+    min-width: 240px;
+    max-width: 75vw;
+    height: 100%;
+    background: var(--bg-panel);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+  }
+
+  .pane-tabs {
+    height: 38px;
+    background: #19191f;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    user-select: none;
+  }
+  .tab-list {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+  }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    height: 100%;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab-btn:hover { color: var(--text-main); }
+  .tab-btn.active {
+    color: #fff;
+    border-bottom-color: var(--accent);
+  }
+
+  .sync-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .sync-toggle input { accent-color: var(--accent); cursor: pointer; }
+
+  /* Code Editor with Line Numbers */
+  .editor-wrap {
+    position: relative;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    background: var(--bg-editor);
+  }
+  .line-numbers {
+    width: 44px;
+    padding: 14px 8px 14px 0;
+    background: var(--bg-gutter);
+    border-right: 1px solid #23232b;
+    color: #58586a;
+    font-family: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: right;
+    user-select: none;
+    overflow: hidden;
+  }
+  .code-textarea {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 14px 14px;
+    background: transparent;
+    color: #f1f1f7;
+    font-family: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 20px;
+    tab-size: 2;
+    white-space: pre;
+    overflow: auto;
+  }
+
+  /* Error Box */
+  #error-banner {
+    display: none;
+    background: #2d161b;
+    border-top: 1px solid #6b2331;
+    color: #ff9da7;
+    padding: 10px 12px;
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 11.5px;
+    line-height: 1.45;
+    max-height: 140px;
+    overflow: auto;
+    white-space: pre-wrap;
+  }
+  #error-banner.visible { display: block; }
+
+  /* Status Footer inside Left Pane */
+  .editor-footer {
+    height: 28px;
+    background: #16161b;
+    border-top: 1px solid var(--border);
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    user-select: none;
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2ecc71;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  .status-dot.err { background: #ff4757; }
+
+  /* Draggable Splitter */
+  #splitter {
+    width: 5px;
+    cursor: col-resize;
+    background: #19191f;
+    transition: background 0.15s;
+    position: relative;
+    z-index: 5;
+  }
+  #splitter:hover, #splitter.dragging {
+    background: var(--accent);
+  }
+
+  /* Right Preview Canvas */
+  #right-pane {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg-canvas);
+  }
+  #right-pane.grid-on {
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  #right-pane.light-canvas {
+    background-color: #f8f9fb;
+  }
+  #right-pane.light-canvas.grid-on {
+    background-image:
+      linear-gradient(to right, rgba(0,0,0,0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.07) 1px, transparent 1px);
+  }
+
+  #container {
+    width: 100%;
+    height: 100%;
+  }
+  #container svg {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Floating Canvas Controls */
+  #canvas-controls {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(30, 30, 36, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 4px;
+    z-index: 10;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-main);
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover { background: #32323d; }
+  .icon-btn.active {
+    background: var(--accent-soft);
+    color: #ff6996;
+  }
+  .zoom-readout {
+    min-width: 46px;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    user-select: none;
+  }
+  .divider-v {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 2px;
+  }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #282832;
+    color: #fff;
+    border: 1px solid #3e3e4d;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 100;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .file-badge-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #23232b;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+  .file-badge-wrap input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 11.5px;
+    width: 125px;
+  }
+  .file-badge-wrap input:focus {
+    color: #fff;
+  }
+  body.drag-over::after {
+    content: "Lepaskan file .mmd untuk membuka diagram";
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 20, 23, 0.82);
+    border: 2px dashed var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    z-index: 200;
+    pointer-events: none;
+  }
+
+  /* Safety Lock Housing for External mermaid.live Button */
+  .safety-group {
+    display: inline-flex;
+    align-items: center;
+    background: #1f1f26;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 2px;
+    gap: 2px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .safety-group.armed {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(255, 54, 112, 0.2);
+  }
+  .safety-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 5px;
+    user-select: none;
+  }
+  .safety-switch:hover {
+    background: #2a2a34;
+    color: var(--text-main);
+  }
+  .safety-group.armed .safety-switch {
+    color: #ff6996;
+  }
+  .safety-switch input {
+    accent-color: var(--accent);
+    cursor: pointer;
+    margin: 0;
+  }
+  #btn-open-live {
+    border-radius: 5px;
+    padding: 4px 10px;
+  }
+  #btn-open-live:disabled {
+    background: #26262f;
+    border-color: transparent;
+    color: #6c6c7e;
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Header Bar -->
+<header id="topbar">
+  <div class="brand">
+    <span class="brand-logo"><i class="fa-solid fa-diagram-project"></i></span>
+    <span>Mermaid Live</span>
+    <span class="airgap-badge" title="100% Offline & Air-Gapped: CSP connect-src 'none' memblokir semua trafik jaringan keluar">
+      <i class="fa-solid fa-lock"></i> 100% Offline • Air-Gapped
+    </span>
+  </div>
+
+  <div class="top-actions">
+    <input type="file" id="file-input-mmd" accept=".mmd,.mermaid,.txt,.md" style="display:none">
+    <button class="btn" id="btn-load-mmd" title="Buka file .mmd dari komputer (Ctrl/Cmd+O atau Drag & Drop)">
+      <i class="fa-regular fa-folder-open"></i> Load .mmd
+    </button>
+    <button class="btn" id="btn-save-mmd" title="Simpan kode ke file .mmd (Ctrl/Cmd+S)">
+      <i class="fa-regular fa-floppy-disk"></i> Save .mmd
+    </button>
+
+    <div class="ctrl-group">
+      <label for="sample-select">Sample:</label>
+      <select id="sample-select" title="Pilih contoh diagram">
+        <option value="christmas" selected>Flowchart (Christmas)</option>
+        <option value="sequence">Sequence Diagram</option>
+        <option value="state">State Diagram</option>
+        <option value="class">Class Diagram</option>
+        <option value="er">ER Diagram</option>
+      </select>
+    </div>
+
+    <div class="ctrl-group">
+      <label for="theme-select">Theme:</label>
+      <select id="theme-select" title="Pilih tema Mermaid">
+        <option value="redux-dark-color" selected>redux-dark-color</option>
+        <option value="redux-color">redux-color</option>
+        <option value="redux-dark">redux-dark</option>
+        <option value="redux">redux</option>
+        <option value="dark">dark</option>
+        <option value="default">default</option>
+        <option value="forest">forest</option>
+        <option value="neutral">neutral</option>
+        <option value="base">base</option>
+      </select>
+    </div>
+
+    <button class="btn" id="btn-copy-code" title="Salin kode Mermaid">
+      <i class="fa-regular fa-copy"></i> Copy Code
+    </button>
+    <button class="btn" id="btn-download-svg" title="Unduh file SVG">
+      <i class="fa-solid fa-download"></i> SVG
+    </button>
+    <button class="btn" id="btn-download-png" title="Unduh gambar PNG">
+      <i class="fa-regular fa-image"></i> PNG
+    </button>
+
+    <div class="safety-group" id="safety-group">
+      <label class="safety-switch" title="Kunci pengaman (Safety Lock): ceklis untuk mengaktifkan tombol kirim ke mermaid.live">
+        <input type="checkbox" id="safety-lock-check">
+        <i class="fa-solid fa-lock" id="safety-lock-icon"></i>
+      </label>
+      <button class="btn btn-primary" id="btn-open-live" disabled title="Terkunci (Safety ON) — ceklis kunci di sebelah kiri untuk membuka">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> mermaid.live
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Main Split Workspace -->
+<main id="workspace">
+  <!-- Left Panel: Editor -->
+  <section id="left-pane">
+    <div class="pane-tabs">
+      <div class="tab-list">
+        <button class="tab-btn active" data-tab="code">
+          <i class="fa-solid fa-code"></i> Code
+        </button>
+        <button class="tab-btn" data-tab="config">
+          <i class="fa-solid fa-sliders"></i> Config
+        </button>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="file-badge-wrap" title="Nama file .mmd aktif">
+          <i class="fa-regular fa-file-code"></i>
+          <input type="text" id="file-name-input" value="christmas.mmd" spellcheck="false">
+        </div>
+        <label class="sync-toggle">
+          <input type="checkbox" id="auto-sync" checked>
+          <span>Auto-Sync</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="line-numbers" id="line-numbers">1</div>
+      <textarea id="code-editor" class="code-textarea" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+    </div>
+
+    <div id="error-banner"></div>
+
+    <div class="editor-footer">
+      <div>
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Ready (Offline)</span>
+      </div>
+      <span id="cursor-pos">Ln 1, Col 1</span>
+    </div>
+  </section>
+
+  <!-- Resizer Handle -->
+  <div id="splitter" title="Geser untuk mengubah lebar panel"></div>
+
+  <!-- Right Panel: Diagram Preview -->
+  <section id="right-pane" class="grid-on">
+    <div id="container"></div>
+
+    <div id="canvas-controls">
+      <button class="icon-btn" id="zout" title="Zoom out"><i class="fa-solid fa-minus"></i></button>
+      <span class="zoom-readout" id="zoom-label">88%</span>
+      <button class="icon-btn" id="zin" title="Zoom in"><i class="fa-solid fa-plus"></i></button>
+      <button class="icon-btn" id="zreset" title="Reset view"><i class="fa-solid fa-expand"></i></button>
+      <div class="divider-v"></div>
+      <button class="icon-btn active" id="btn-grid" title="Toggle grid"><i class="fa-solid fa-border-all"></i></button>
+      <button class="icon-btn" id="btn-bg" title="Toggle warna background canvas"><i class="fa-solid fa-circle-half-stroke"></i></button>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+  const mermaid = window.mermaid;
+
+  const SAMPLES = {
+    christmas: `flowchart TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]`,
+    sequence: `sequenceDiagram
+    autonumber
+    Alice->>John: Hello John, how are you?
+    loop HealthCheck
+        John->>John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts!
+    John-->>Alice: Great!
+    John->>Bob: How about you?
+    Bob-->>John: Jolly good!`,
+    state: `stateDiagram-v2
+    [*] --> Still
+    Still --> [*]
+    Still --> Moving
+    Moving --> Still
+    Moving --> Crash
+    Crash --> [*]`,
+    class: `classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal <|-- Zebra
+    Animal : +int age
+    Animal : +String gender
+    Animal: +isMammal()
+    class Duck{
+      +String beakColor
+      +swim()
+      +quack()
+    }`,
+    er: `erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses`
+  };
+
+  let activeTab = 'code';
+  let mermaidCode = SAMPLES.christmas + '\n  ';
+  let configCode = JSON.stringify({ theme: 'redux-dark-color' }, null, 2);
+
+  const editor = document.getElementById('code-editor');
+  const lineNumbers = document.getElementById('line-numbers');
+  const errorBanner = document.getElementById('error-banner');
+  const statusDot = document.getElementById('status-dot');
+  const statusText = document.getElementById('status-text');
+  const cursorPos = document.getElementById('cursor-pos');
+  const container = document.getElementById('container');
+  const zoomLabel = document.getElementById('zoom-label');
+  const themeSelect = document.getElementById('theme-select');
+  const sampleSelect = document.getElementById('sample-select');
+  const autoSync = document.getElementById('auto-sync');
+  const rightPane = document.getElementById('right-pane');
+
+  let pz = null;
+  let renderCounter = 0;
+  let isFirstRender = true;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function updateLineNumbers() {
+    const lines = editor.value.split('\n').length;
+    let html = '';
+    for (let i = 1; i <= lines; i++) html += i + '<br>';
+    lineNumbers.innerHTML = html;
+  }
+
+  function updateCursorInfo() {
+    const pos = editor.selectionStart || 0;
+    const upto = editor.value.slice(0, pos).split('\n');
+    cursorPos.textContent = `Ln ${upto.length}, Col ${upto[upto.length - 1].length + 1}`;
+  }
+
+  editor.addEventListener('scroll', () => {
+    lineNumbers.scrollTop = editor.scrollTop;
+  });
+  editor.addEventListener('click', updateCursorInfo);
+  editor.addEventListener('keyup', updateCursorInfo);
+
+  editor.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+      editor.selectionStart = editor.selectionEnd = start + 4;
+      onEditorInput();
+    }
+  });
+
+  function updateZoomReadout() {
+    if (!pz) return;
+    zoomLabel.textContent = `${Math.round(pz.getZoom() * 100)}%`;
+  }
+
+  function resetView() {
+    if (!pz) return;
+    pz.resize();
+    pz.fit();
+    pz.center();
+    pz.zoom(0.875);
+    updateZoomReadout();
+  }
+
+  async function renderDiagram(preserveViewport = true) {
+    let parsedConfig = { theme: 'redux-dark-color' };
+    try {
+      parsedConfig = JSON.parse(configCode);
+    } catch (err) {
+      errorBanner.textContent = `JSON Config Error:\n${err.message}`;
+      errorBanner.classList.add('visible');
+      statusDot.classList.add('err');
+      statusText.textContent = 'Config JSON Error';
+      return;
+    }
+
+    let prevZoom = null;
+    let prevPan = null;
+    if (preserveViewport && pz && !isFirstRender) {
+      try {
+        prevZoom = pz.getZoom();
+        prevPan = pz.getPan();
+      } catch (_) {}
+    }
+
+    try {
+      // Sanitasi user config agar tidak menurunkan securityLevel
+      const sanitizedConfig = { ...parsedConfig };
+      delete sanitizedConfig.securityLevel;
+      delete sanitizedConfig.secure;
+      delete sanitizedConfig.startOnLoad;
+
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'antiscript',
+        secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'maxEdges', 'htmlLabels'],
+        maxTextSize: 100000,
+        flowchart: {
+          htmlLabels: true,
+          ...(sanitizedConfig.flowchart || {})
+        },
+        ...sanitizedConfig,
+        securityLevel: 'antiscript'
+      });
+
+      renderCounter++;
+      const id = `mermaid-svg-${renderCounter}`;
+      const { svg } = await mermaid.render(id, mermaidCode);
+
+      if (pz) {
+        try { pz.destroy(); } catch (_) {}
+        pz = null;
+      }
+
+      container.innerHTML = svg;
+
+      // Sanitasi link di dalam SVG
+      container.querySelectorAll('a').forEach(anchor => {
+        const href = anchor.getAttribute('href') || '';
+        if (/^(javascript|data|vbscript):/i.test(href)) {
+          anchor.removeAttribute('href');
+        }
+      });
+
+      const svgEl = container.querySelector('svg');
+      pz = svgPanZoom(svgEl, {
+        zoomEnabled: true,
+        panEnabled: true,
+        controlIconsEnabled: false,
+        fit: true,
+        center: true,
+        minZoom: 0.1,
+        maxZoom: 20,
+        zoomScaleSensitivity: 0.3,
+        onZoom: updateZoomReadout
+      });
+
+      if (isFirstRender || !preserveViewport || prevZoom === null) {
+        resetView();
+        isFirstRender = false;
+      } else {
+        pz.zoom(prevZoom);
+        pz.pan(prevPan);
+        updateZoomReadout();
+      }
+
+      errorBanner.classList.remove('visible');
+      statusDot.classList.remove('err');
+      statusText.textContent = 'Synced (100% Offline)';
+    } catch (err) {
+      errorBanner.textContent = err?.message || String(err);
+      errorBanner.classList.add('visible');
+      statusDot.classList.add('err');
+      statusText.textContent = 'Syntax Error';
+    }
+  }
+
+  let debounceTimer = null;
+  function onEditorInput() {
+    if (activeTab === 'code') {
+      mermaidCode = editor.value;
+    } else {
+      configCode = editor.value;
+      try {
+        const cfg = JSON.parse(configCode);
+        if (cfg.theme && [...themeSelect.options].some(o => o.value === cfg.theme)) {
+          themeSelect.value = cfg.theme;
+        }
+      } catch (_) {}
+    }
+    updateLineNumbers();
+    updateCursorInfo();
+
+    if (!autoSync.checked) {
+      statusText.textContent = 'Modified (Auto-Sync off)';
+      return;
+    }
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => renderDiagram(true), 160);
+  }
+
+  editor.addEventListener('input', onEditorInput);
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTab = btn.dataset.tab;
+      editor.value = activeTab === 'code' ? mermaidCode : configCode;
+      updateLineNumbers();
+      updateCursorInfo();
+    });
+  });
+
+  themeSelect.addEventListener('change', () => {
+    try {
+      const cfg = JSON.parse(configCode);
+      cfg.theme = themeSelect.value;
+      configCode = JSON.stringify(cfg, null, 2);
+    } catch (_) {
+      configCode = JSON.stringify({ theme: themeSelect.value }, null, 2);
+    }
+    if (activeTab === 'config') {
+      editor.value = configCode;
+      updateLineNumbers();
+    }
+    renderDiagram(true);
+  });
+
+  const fileNameInput = document.getElementById('file-name-input');
+  const fileInputMmd = document.getElementById('file-input-mmd');
+
+  function getBaseFileName() {
+    const raw = (fileNameInput.value || 'diagram.mmd').trim();
+    return raw.replace(/\.(mmd|mermaid|txt|md)$/i, '') || 'diagram';
+  }
+
+  function getMmdFileName() {
+    const raw = (fileNameInput.value || 'diagram.mmd').trim();
+    return /\.(mmd|mermaid)$/i.test(raw) ? raw : `${raw}.mmd`;
+  }
+
+  function loadMmdContent(content, name = 'diagram.mmd') {
+    mermaidCode = content;
+    fileNameInput.value = name;
+    if (activeTab !== 'code') {
+      document.querySelector('.tab-btn[data-tab="code"]').click();
+    } else {
+      editor.value = mermaidCode;
+      updateLineNumbers();
+      updateCursorInfo();
+    }
+    renderDiagram(false);
+    showToast(`File "${name}" berhasil dimuat!`);
+  }
+
+  document.getElementById('btn-load-mmd').onclick = async () => {
+    if (window.showOpenFilePicker) {
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{
+            description: 'Mermaid Diagram (.mmd, .mermaid)',
+            accept: { 'text/plain': ['.mmd', '.mermaid', '.txt', '.md'] }
+          }],
+          multiple: false
+        });
+        const file = await handle.getFile();
+        const text = await file.text();
+        loadMmdContent(text, file.name);
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+    fileInputMmd.value = '';
+    fileInputMmd.click();
+  };
+
+  fileInputMmd.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    loadMmdContent(text, file.name);
+  });
+
+  async function saveMmdFile() {
+    const suggestedName = getMmdFileName();
+    fileNameInput.value = suggestedName;
+
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName,
+          types: [{
+            description: 'Mermaid Diagram (.mmd)',
+            accept: { 'text/plain': ['.mmd', '.mermaid'] }
+          }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(mermaidCode);
+        await writable.close();
+        fileNameInput.value = handle.name;
+        showToast(`Disimpan ke "${handle.name}"!`);
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+
+    const blob = new Blob([mermaidCode], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = suggestedName;
+    a.click();
+    showToast(`File "${suggestedName}" berhasil diunduh!`);
+  }
+
+  document.getElementById('btn-save-mmd').onclick = saveMmdFile;
+
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    document.body.classList.add('drag-over');
+  });
+  window.addEventListener('dragleave', (e) => {
+    if (e.relatedTarget === null) document.body.classList.remove('drag-over');
+  });
+  window.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    document.body.classList.remove('drag-over');
+    const file = e.dataTransfer?.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    loadMmdContent(text, file.name);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveMmdFile();
+    } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') {
+      e.preventDefault();
+      document.getElementById('btn-load-mmd').click();
+    }
+  });
+
+  sampleSelect.addEventListener('change', () => {
+    mermaidCode = SAMPLES[sampleSelect.value] || SAMPLES.christmas;
+    fileNameInput.value = `${sampleSelect.value}.mmd`;
+    if (activeTab === 'code') {
+      editor.value = mermaidCode;
+      updateLineNumbers();
+    }
+    renderDiagram(false);
+  });
+
+  autoSync.addEventListener('change', () => {
+    if (autoSync.checked) renderDiagram(true);
+  });
+
+  document.getElementById('zin').onclick = () => { pz?.zoomIn(); updateZoomReadout(); };
+  document.getElementById('zout').onclick = () => { pz?.zoomOut(); updateZoomReadout(); };
+  document.getElementById('zreset').onclick = resetView;
+
+  const btnGrid = document.getElementById('btn-grid');
+  btnGrid.onclick = () => {
+    rightPane.classList.toggle('grid-on');
+    btnGrid.classList.toggle('active');
+  };
+
+  const btnBg = document.getElementById('btn-bg');
+  btnBg.onclick = () => {
+    rightPane.classList.toggle('light-canvas');
+    btnBg.classList.toggle('active');
+  };
+
+  document.getElementById('btn-copy-code').onclick = async () => {
+    await navigator.clipboard.writeText(mermaidCode);
+    showToast('Kode Mermaid berhasil disalin!');
+  };
+
+  document.getElementById('btn-download-svg').onclick = () => {
+    const svgEl = container.querySelector('svg');
+    if (!svgEl) return;
+    const blob = new Blob([svgEl.outerHTML], { type: 'image/svg+xml;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${getBaseFileName()}.svg`;
+    a.click();
+    showToast('SVG berhasil diunduh!');
+  };
+
+  document.getElementById('btn-download-png').onclick = () => {
+    const svgEl = container.querySelector('svg');
+    if (!svgEl) return;
+    const cloned = svgEl.cloneNode(true);
+    const box = svgEl.getBoundingClientRect();
+    cloned.setAttribute('width', box.width * 2);
+    cloned.setAttribute('height', box.height * 2);
+    const svgData = new XMLSerializer().serializeToString(cloned);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = box.width * 2;
+      canvas.height = box.height * 2;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = rightPane.classList.contains('light-canvas') ? '#f8f9fb' : '#1b1b1f';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = `${getBaseFileName()}.png`;
+      a.click();
+      showToast('PNG berhasil diunduh!');
+    };
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
+  const safetyCheck = document.getElementById('safety-lock-check');
+  const safetyGroup = document.getElementById('safety-group');
+  const safetyIcon = document.getElementById('safety-lock-icon');
+  const btnOpenLive = document.getElementById('btn-open-live');
+
+  function setSafetyArmed(armed) {
+    safetyCheck.checked = armed;
+    btnOpenLive.disabled = !armed;
+    safetyGroup.classList.toggle('armed', armed);
+    safetyIcon.className = armed ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
+    btnOpenLive.title = armed
+      ? 'Safety OFF — Klik untuk mengirim diagram ke mermaid.live'
+      : 'Terkunci (Safety ON) — ceklis kunci di sebelah kiri untuk membuka';
+  }
+
+  safetyCheck.addEventListener('change', () => {
+    const armed = safetyCheck.checked;
+    setSafetyArmed(armed);
+    if (armed) {
+      showToast('🔓 Safety OFF: Tombol mermaid.live siap digunakan');
+    } else {
+      showToast('🔒 Safety ON: Tombol mermaid.live dikunci');
+    }
+  });
+
+  btnOpenLive.onclick = () => {
+    if (!safetyCheck.checked) return;
+    const ok = window.confirm(
+      'PERINGATAN KONFIDENSIAL:\nDiagram akan dibuka di situs eksternal mermaid.live.\nLanjutkan?'
+    );
+    if (!ok) {
+      setSafetyArmed(false);
+      return;
+    }
+    const state = {
+      code: mermaidCode,
+      mermaid: configCode,
+      autoSync: autoSync.checked,
+      updateDiagram: true,
+      panZoom: true,
+      grid: rightPane.classList.contains('grid-on')
+    };
+    const json = JSON.stringify(state);
+    const compressed = window.pako.deflate(new TextEncoder().encode(json), { level: 9 });
+    let binary = '';
+    compressed.forEach(b => binary += String.fromCharCode(b));
+    const b64url = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    window.open(`https://mermaid.live/edit#pako:${b64url}`, '_blank');
+    setSafetyArmed(false);
+  };
+
+  // Resizable Split Pane
+  const splitter = document.getElementById('splitter');
+  const leftPane = document.getElementById('left-pane');
+  let isDragging = false;
+
+  splitter.addEventListener('mousedown', () => {
+    isDragging = true;
+    splitter.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const newWidth = Math.max(240, Math.min(window.innerWidth * 0.75, e.clientX));
+    leftPane.style.width = `${newWidth}px`;
+    pz?.resize();
+  });
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    splitter.classList.remove('dragging');
+    document.body.style.cursor = '';
+  });
+
+  window.addEventListener('resize', () => pz?.resize());
+
+  // Initial load
+  editor.value = mermaidCode;
+  updateLineNumbers();
+  renderDiagram(false);
+</script>
+</body>
+</html>

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mermaid Live Editor — Local</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 <style>
@@ -52,6 +53,7 @@
     font-weight: 600;
     font-size: 14px;
     color: #fff;
+    white-space: nowrap;
   }
   .brand-logo {
     width: 26px;
@@ -63,15 +65,20 @@
     justify-content: center;
     color: #fff;
     font-size: 13px;
+    flex-shrink: 0;
   }
-  .brand-badge {
+  .airgap-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 11px;
     font-weight: 500;
-    padding: 2px 7px;
+    padding: 2px 8px;
     border-radius: 99px;
-    background: var(--accent-soft);
-    color: #ff6996;
-    border: 1px solid rgba(255, 54, 112, 0.3);
+    background: rgba(46, 204, 113, 0.12);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.35);
+    white-space: nowrap;
   }
 
   .top-actions {
@@ -87,6 +94,7 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 3px 8px;
+    white-space: nowrap;
   }
   .ctrl-group label {
     color: var(--text-muted);
@@ -103,6 +111,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
     transition: background 0.15s, border-color 0.15s;
   }
   .ctrl-group select {
@@ -468,6 +477,102 @@
     cursor: not-allowed;
     opacity: 0.55;
   }
+
+  /* Left Color Preset Column (1 Kolom Kecil) */
+  #color-sidebar {
+    width: 108px;
+    flex-shrink: 0;
+    height: 100%;
+    background: #141418;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 8px 7px;
+    gap: 6px;
+    user-select: none;
+    overflow-y: auto;
+  }
+  .color-sidebar-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .target-node-box {
+    background: #1e1e26;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .target-node-box label {
+    font-size: 9.5px;
+    color: var(--text-muted);
+  }
+  .target-node-box select {
+    width: 100%;
+    padding: 3px 4px;
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #fff;
+    background: #141418;
+    border: 1px solid #343442;
+    border-radius: 4px;
+  }
+  .color-preset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+  .color-box-btn {
+    width: 100%;
+    padding: 5px 4px;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.35);
+    transition: transform 0.1s, filter 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  .color-box-btn:hover {
+    transform: scale(1.04);
+    filter: brightness(1.15);
+  }
+  .color-box-btn:active {
+    transform: scale(0.97);
+  }
+  .color-box-btn .mnem {
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 10px;
+    background: rgba(0,0,0,0.32);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .color-box-btn.reset-btn {
+    background: #141418;
+    border: 1.5px dashed #8b8b9e;
+    color: #c7c7d6;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .color-box-btn.reset-btn:hover {
+    border-color: #fff;
+    color: #fff;
+  }
 </style>
 </head>
 <body>
@@ -477,7 +582,9 @@
   <div class="brand">
     <span class="brand-logo"><i class="fa-solid fa-diagram-project"></i></span>
     <span>Mermaid Live</span>
-    <span class="brand-badge">Local Editor</span>
+    <span class="airgap-badge" title="100% Offline & Air-Gapped: CSP connect-src 'none' memblokir semua trafik jaringan keluar">
+      <i class="fa-solid fa-lock"></i> 100% Offline • Air-Gapped
+    </span>
   </div>
 
   <div class="top-actions">
@@ -539,6 +646,16 @@
 
 <!-- Main Split Workspace -->
 <main id="workspace">
+  <!-- Kolom Kecil Preset Warna Node -->
+  <aside id="color-sidebar">
+    <div class="color-sidebar-title">Warna Node</div>
+    <div class="target-node-box" title="Node yang akan diwarnai (otomatis mengikuti baris kursor atau klik kotak di diagram)">
+      <label for="target-node-select">Target Node:</label>
+      <select id="target-node-select"></select>
+    </div>
+    <div class="color-preset-list" id="color-preset-list"></div>
+  </aside>
+
   <!-- Left Panel: Editor -->
   <section id="left-pane">
     <div class="pane-tabs">
@@ -572,7 +689,7 @@
     <div class="editor-footer">
       <div>
         <span class="status-dot" id="status-dot"></span>
-        <span id="status-text">Ready</span>
+        <span id="status-text">Ready (Offline)</span>
       </div>
       <span id="cursor-pos">Ln 1, Col 1</span>
     </div>
@@ -599,8 +716,8 @@
 
 <div id="toast"></div>
 
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+<script>
+  const mermaid = window.mermaid;
 
   const SAMPLES = {
     christmas: `flowchart TD
@@ -660,10 +777,34 @@
   const sampleSelect = document.getElementById('sample-select');
   const autoSync = document.getElementById('auto-sync');
   const rightPane = document.getElementById('right-pane');
+  const targetNodeSelect = document.getElementById('target-node-select');
+  const colorPresetList = document.getElementById('color-preset-list');
+
+  const COLOR_PRESETS = [
+    { code: 'M',  name: 'Merah',   fill: '#b91c1c' },
+    { code: 'O',  name: 'Oranye',  fill: '#c2410c' },
+    { code: 'K',  name: 'Kuning',  fill: '#a16207' },
+    { code: 'H',  name: 'Hijau',   fill: '#15803d' },
+    { code: 'T',  name: 'Tosca',   fill: '#0f766e' },
+    { code: 'C',  name: 'Cyan',    fill: '#0369a1' },
+    { code: 'B',  name: 'Biru',    fill: '#1d4ed8' },
+    { code: 'I',  name: 'Indigo',  fill: '#4338ca' },
+    { code: 'U',  name: 'Ungu',    fill: '#6d28d9' },
+    { code: 'P',  name: 'Pink',    fill: '#be185d' },
+    { code: 'CK', name: 'Cokelat', fill: '#78350f' },
+    { code: 'A',  name: 'Abu',     fill: '#374151' }
+  ];
+
+  const RESERVED_WORDS = new Set([
+    'flowchart', 'graph', 'TD', 'TB', 'BT', 'RL', 'LR',
+    'subgraph', 'end', 'direction', 'style', 'classDef', 'class', 'click', 'linkStyle',
+    'sequenceDiagram', 'stateDiagram', 'stateDiagram-v2', 'classDiagram', 'erDiagram'
+  ]);
 
   let pz = null;
   let renderCounter = 0;
   let isFirstRender = true;
+  let currentTargetNode = 'A';
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -672,6 +813,140 @@
     clearTimeout(showToast._timer);
     showToast._timer = setTimeout(() => t.classList.remove('show'), 2200);
   }
+
+  // Extract node tokens [{id, index}] from a single line of Mermaid flowchart
+  function extractNodesFromLine(rawLine) {
+    const noComment = rawLine.replace(/%%.*$/, '');
+    const trimmed = noComment.trim();
+    if (!trimmed) return [];
+
+    // Check if it's a style line: style <NodeID> ...
+    const styleMatch = noComment.match(/^\s*style\s+([A-Za-z0-9_-]+)\b/);
+    if (styleMatch) {
+      return [{ id: styleMatch[1], index: noComment.indexOf(styleMatch[1]) }];
+    }
+    if (/^\s*(flowchart|graph|subgraph|end|direction|classDef|class|click|linkStyle)\b/.test(noComment)) {
+      return [];
+    }
+
+    // Mask out edge labels |...|, node shapes [...], (...), {...}, and :::class
+    const masked = noComment
+      .replace(/\|[^|]*\|/g, m => ' '.repeat(m.length))
+      .replace(/\[[^\]]*\]/g, m => ' '.repeat(m.length))
+      .replace(/\([^)]*\)/g, m => ' '.repeat(m.length))
+      .replace(/\{[^}]*\}/g, m => ' '.repeat(m.length))
+      .replace(/:::[A-Za-z0-9_-]+/g, m => ' '.repeat(m.length));
+
+    const results = [];
+    const regex = /\b([A-Za-z_][A-Za-z0-9_-]*)\b/g;
+    let m;
+    while ((m = regex.exec(masked)) !== null) {
+      if (!RESERVED_WORDS.has(m[1])) {
+        results.push({ id: m[1], index: m.index });
+      }
+    }
+    return results;
+  }
+
+  function refreshNodeDropdown(preferredNode = null) {
+    const allNodes = [];
+    const seen = new Set();
+    mermaidCode.split('\n').forEach(line => {
+      extractNodesFromLine(line).forEach(item => {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          allNodes.push(item.id);
+        }
+      });
+    });
+
+    const prev = preferredNode || currentTargetNode || targetNodeSelect.value;
+    targetNodeSelect.innerHTML = '';
+    allNodes.forEach(id => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = id;
+      targetNodeSelect.appendChild(opt);
+    });
+
+    if (prev && seen.has(prev)) {
+      targetNodeSelect.value = prev;
+      currentTargetNode = prev;
+    } else if (allNodes.length > 0) {
+      targetNodeSelect.value = allNodes[0];
+      currentTargetNode = allNodes[0];
+    }
+  }
+
+  targetNodeSelect.addEventListener('change', () => {
+    currentTargetNode = targetNodeSelect.value;
+  });
+
+  function applyColorToTargetNode(preset) {
+    refreshNodeDropdown();
+    const nodeId = targetNodeSelect.value;
+    if (!nodeId) {
+      showToast('Tidak ada node yang terdeteksi di diagram');
+      return;
+    }
+
+    const lines = mermaidCode.split('\n');
+    const styleRegex = new RegExp(`^\\s*style\\s+${nodeId}\\b.*$`);
+
+    if (!preset) {
+      // Reset color: remove existing style <nodeId> line and any :::mnemonic on that node
+      const filtered = lines.filter(l => !styleRegex.test(l));
+      mermaidCode = filtered.join('\n');
+      showToast(`Warna node "${nodeId}" di-reset`);
+    } else {
+      const newStyleLine = `    style ${nodeId} fill:${preset.fill},stroke:#fff,stroke-width:2px,color:#fff`;
+      let found = false;
+      const updated = lines.map(l => {
+        if (styleRegex.test(l)) {
+          found = true;
+          return newStyleLine;
+        }
+        return l;
+      });
+      if (!found) {
+        // Trim trailing blank lines before appending style line
+        while (updated.length > 0 && updated[updated.length - 1].trim() === '') {
+          updated.pop();
+        }
+        updated.push(newStyleLine);
+      }
+      mermaidCode = updated.join('\n') + '\n';
+      showToast(`Node "${nodeId}" → ${preset.name} (${preset.code})`);
+    }
+
+    if (activeTab === 'code') {
+      editor.value = mermaidCode;
+      updateLineNumbers();
+    }
+    renderDiagram(true);
+  }
+
+  // Build Color Preset Buttons in Left Column
+  function initColorPresetButtons() {
+    colorPresetList.innerHTML = '';
+    COLOR_PRESETS.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'color-box-btn';
+      btn.style.background = p.fill;
+      btn.title = `Warnai node aktif menjadi ${p.name} (stroke putih). Bisa juga ketik :::${p.code}`;
+      btn.innerHTML = `<span>${p.name}</span><span class="mnem">${p.code}</span>`;
+      btn.onclick = () => applyColorToTargetNode(p);
+      colorPresetList.appendChild(btn);
+    });
+
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'color-box-btn reset-btn';
+    resetBtn.title = 'Hapus warna kustom pada node aktif';
+    resetBtn.textContent = '✕ Reset';
+    resetBtn.onclick = () => applyColorToTargetNode(null);
+    colorPresetList.appendChild(resetBtn);
+  }
+  initColorPresetButtons();
 
   function updateLineNumbers() {
     const lines = editor.value.split('\n').length;
@@ -683,7 +958,27 @@
   function updateCursorInfo() {
     const pos = editor.selectionStart || 0;
     const upto = editor.value.slice(0, pos).split('\n');
-    cursorPos.textContent = `Ln ${upto.length}, Col ${upto[upto.length - 1].length + 1}`;
+    const lineIdx = upto.length - 1;
+    const colIdx = upto[lineIdx].length;
+    cursorPos.textContent = `Ln ${lineIdx + 1}, Col ${colIdx + 1}`;
+
+    if (activeTab === 'code') {
+      const allLines = editor.value.split('\n');
+      const currentLine = allLines[lineIdx] || '';
+      const nodesOnLine = extractNodesFromLine(currentLine);
+      if (nodesOnLine.length === 1) {
+        currentTargetNode = nodesOnLine[0].id;
+        refreshNodeDropdown(currentTargetNode);
+      } else if (nodesOnLine.length >= 2) {
+        const arrowMatch = currentLine.match(/--+>|--+|\.-+>|\.-+|==+>/);
+        if (arrowMatch && colIdx <= arrowMatch.index) {
+          currentTargetNode = nodesOnLine[0].id;
+        } else {
+          currentTargetNode = nodesOnLine[nodesOnLine.length - 1].id;
+        }
+        refreshNodeDropdown(currentTargetNode);
+      }
+    }
   }
 
   editor.addEventListener('scroll', () => {
@@ -692,7 +987,6 @@
   editor.addEventListener('click', updateCursorInfo);
   editor.addEventListener('keyup', updateCursorInfo);
 
-  // Support Tab indentation inside textarea
   editor.addEventListener('keydown', (e) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -719,6 +1013,7 @@
   }
 
   async function renderDiagram(preserveViewport = true) {
+    refreshNodeDropdown();
     let parsedConfig = { theme: 'redux-dark-color' };
     try {
       parsedConfig = JSON.parse(configCode);
@@ -730,7 +1025,6 @@
       return;
     }
 
-    // Save previous viewport before re-render
     let prevZoom = null;
     let prevPan = null;
     if (preserveViewport && pz && !isFirstRender) {
@@ -741,15 +1035,37 @@
     }
 
     try {
+      // Sanitasi user config agar tidak menurunkan securityLevel
+      const sanitizedConfig = { ...parsedConfig };
+      delete sanitizedConfig.securityLevel;
+      delete sanitizedConfig.secure;
+      delete sanitizedConfig.startOnLoad;
+
       mermaid.initialize({
         startOnLoad: false,
-        securityLevel: 'loose',
-        ...parsedConfig
+        securityLevel: 'antiscript',
+        secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'maxEdges', 'htmlLabels'],
+        maxTextSize: 100000,
+        flowchart: {
+          htmlLabels: true,
+          ...(sanitizedConfig.flowchart || {})
+        },
+        ...sanitizedConfig,
+        securityLevel: 'antiscript'
       });
+
+      // Support built-in shorthand mnemonics (e.g. :::M, :::B, :::H) if used in flowchart
+      let codeToRender = mermaidCode;
+      if (/^\s*(flowchart|graph)\b/m.test(mermaidCode) && /:::[A-Za-z]+/.test(mermaidCode)) {
+        const mnemonicDefs = COLOR_PRESETS
+          .map(p => `    classDef ${p.code} fill:${p.fill},stroke:#fff,stroke-width:2px,color:#fff`)
+          .join('\n');
+        codeToRender = `${mermaidCode}\n${mnemonicDefs}\n`;
+      }
 
       renderCounter++;
       const id = `mermaid-svg-${renderCounter}`;
-      const { svg, bindFunctions } = await mermaid.render(id, mermaidCode);
+      const { svg } = await mermaid.render(id, codeToRender);
 
       if (pz) {
         try { pz.destroy(); } catch (_) {}
@@ -757,7 +1073,29 @@
       }
 
       container.innerHTML = svg;
-      bindFunctions?.(container);
+
+      // Sanitasi link di dalam SVG
+      container.querySelectorAll('a').forEach(anchor => {
+        const href = anchor.getAttribute('href') || '';
+        if (/^(javascript|data|vbscript):/i.test(href)) {
+          anchor.removeAttribute('href');
+        }
+      });
+
+      // Klik langsung pada node di kanvas diagram untuk memilih Target Node
+      container.querySelectorAll('g.node').forEach(nodeGroup => {
+        nodeGroup.style.cursor = 'pointer';
+        nodeGroup.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const rawId = nodeGroup.id || '';
+          const m = rawId.match(/^flowchart-(.+)-\d+$/);
+          if (m && m[1]) {
+            currentTargetNode = m[1];
+            refreshNodeDropdown(currentTargetNode);
+            showToast(`Target Node dipilih: "${currentTargetNode}"`);
+          }
+        });
+      });
 
       const svgEl = container.querySelector('svg');
       pz = svgPanZoom(svgEl, {
@@ -783,7 +1121,7 @@
 
       errorBanner.classList.remove('visible');
       statusDot.classList.remove('err');
-      statusText.textContent = 'Synced';
+      statusText.textContent = 'Synced (100% Offline)';
     } catch (err) {
       errorBanner.textContent = err?.message || String(err);
       errorBanner.classList.add('visible');
@@ -818,7 +1156,6 @@
 
   editor.addEventListener('input', onEditorInput);
 
-  // Tabs switching (Code vs Config)
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -830,7 +1167,6 @@
     });
   });
 
-  // Theme dropdown
   themeSelect.addEventListener('change', () => {
     try {
       const cfg = JSON.parse(configCode);
@@ -846,7 +1182,6 @@
     renderDiagram(true);
   });
 
-  // Sample selector
   const fileNameInput = document.getElementById('file-name-input');
   const fileInputMmd = document.getElementById('file-input-mmd');
 
@@ -874,7 +1209,6 @@
     showToast(`File "${name}" berhasil dimuat!`);
   }
 
-  // Load .mmd via File Input / Picker
   document.getElementById('btn-load-mmd').onclick = async () => {
     if (window.showOpenFilePicker) {
       try {
@@ -904,7 +1238,6 @@
     loadMmdContent(text, file.name);
   });
 
-  // Save .mmd via Save File Picker or Download
   async function saveMmdFile() {
     const suggestedName = getMmdFileName();
     fileNameInput.value = suggestedName;
@@ -939,7 +1272,6 @@
 
   document.getElementById('btn-save-mmd').onclick = saveMmdFile;
 
-  // Drag & Drop .mmd file anywhere
   window.addEventListener('dragover', (e) => {
     e.preventDefault();
     document.body.classList.add('drag-over');
@@ -956,7 +1288,6 @@
     loadMmdContent(text, file.name);
   });
 
-  // Keyboard shortcuts: Ctrl/Cmd+S (Save .mmd), Ctrl/Cmd+O (Load .mmd)
   window.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
       e.preventDefault();
@@ -981,7 +1312,6 @@
     if (autoSync.checked) renderDiagram(true);
   });
 
-  // Canvas Controls
   document.getElementById('zin').onclick = () => { pz?.zoomIn(); updateZoomReadout(); };
   document.getElementById('zout').onclick = () => { pz?.zoomOut(); updateZoomReadout(); };
   document.getElementById('zreset').onclick = resetView;
@@ -998,7 +1328,6 @@
     btnBg.classList.toggle('active');
   };
 
-  // Top Bar Actions
   document.getElementById('btn-copy-code').onclick = async () => {
     await navigator.clipboard.writeText(mermaidCode);
     showToast('Kode Mermaid berhasil disalin!');
@@ -1068,6 +1397,13 @@
 
   btnOpenLive.onclick = () => {
     if (!safetyCheck.checked) return;
+    const ok = window.confirm(
+      'PERINGATAN KONFIDENSIAL:\nDiagram akan dibuka di situs eksternal mermaid.live.\nLanjutkan?'
+    );
+    if (!ok) {
+      setSafetyArmed(false);
+      return;
+    }
     const state = {
       code: mermaidCode,
       mermaid: configCode,
@@ -1082,7 +1418,6 @@
     compressed.forEach(b => binary += String.fromCharCode(b));
     const b64url = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     window.open(`https://mermaid.live/edit#pako:${b64url}`, '_blank');
-    // Otomatis kunci kembali setelah ditembakkan (auto re-lock)
     setSafetyArmed(false);
   };
 
@@ -1098,7 +1433,8 @@
   });
   window.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
-    const newWidth = Math.max(240, Math.min(window.innerWidth * 0.75, e.clientX));
+    const sidebarW = document.getElementById('color-sidebar')?.offsetWidth || 0;
+    const newWidth = Math.max(240, Math.min(window.innerWidth * 0.75, e.clientX - sidebarW));
     leftPane.style.width = `${newWidth}px`;
     pz?.resize();
   });
@@ -1111,10 +1447,14 @@
 
   window.addEventListener('resize', () => pz?.resize());
 
-  // Initial load
+  // Initial load (wait for local FontAwesome webfonts so icon widths are measured accurately)
   editor.value = mermaidCode;
   updateLineNumbers();
-  renderDiagram(false);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => renderDiagram(false));
+  } else {
+    renderDiagram(false);
+  }
 </script>
 </body>
 </html>

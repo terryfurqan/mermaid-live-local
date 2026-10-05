@@ -478,71 +478,155 @@
     opacity: 0.55;
   }
 
-  /* Left Color Preset Column (1 Kolom Kecil) */
+  /* Left Quick Tool Sidebar (Bentuk Node + Warna Node + Warna Garis) */
   #color-sidebar {
-    width: 108px;
+    width: 154px;
     flex-shrink: 0;
     height: 100%;
     background: #141418;
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    padding: 8px 7px;
-    gap: 6px;
+    padding: 6px 6px;
+    gap: 4px;
     user-select: none;
     overflow-y: auto;
   }
   .color-sidebar-title {
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
     letter-spacing: 0.6px;
     color: var(--text-muted);
     text-align: center;
     text-transform: uppercase;
+    margin-top: 1px;
   }
   .target-node-box {
     background: #1e1e26;
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 6px;
+    border-radius: 5px;
+    padding: 3px 5px;
     display: flex;
-    flex-direction: column;
-    gap: 3px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
   }
   .target-node-box label {
     font-size: 9.5px;
     color: var(--text-muted);
+    white-space: nowrap;
   }
   .target-node-box select {
-    width: 100%;
-    padding: 3px 4px;
+    flex: 1;
+    min-width: 0;
+    padding: 2px 3px;
     font-family: "JetBrains Mono", Menlo, monospace;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 600;
     color: #fff;
     background: #141418;
     border: 1px solid #343442;
     border-radius: 4px;
   }
+
+  /* Segmented Mini Toggles untuk Mode Tambah Node & Penamaan */
+  .node-mode-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: #1a1a22;
+    padding: 2px;
+    border-radius: 5px;
+    border: 1px solid #2b2b38;
+  }
+  .node-mode-bar.two-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .node-mode-btn {
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: var(--text-muted);
+    font-size: 9.5px;
+    font-weight: 600;
+    padding: 2px 2px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    white-space: nowrap;
+  }
+  .node-mode-btn:hover {
+    color: #fff;
+  }
+  .node-mode-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* Grid 15 Tombol Bentuk Flowchart */
+  .shape-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+  }
+  .shape-btn {
+    height: 23px;
+    background: #1e1e26;
+    border: 1px solid #343442;
+    border-radius: 4px;
+    color: #e2e2ee;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5px;
+    padding: 0 2px;
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: transform 0.1s, border-color 0.15s, background 0.15s;
+  }
+  .shape-btn svg {
+    width: 14px;
+    height: 12px;
+    flex-shrink: 0;
+    stroke: #f1f1f7;
+    stroke-width: 1.8;
+    fill: rgba(255, 54, 112, 0.14);
+  }
+  .shape-btn:hover {
+    border-color: var(--accent);
+    background: #262633;
+    color: #fff;
+    transform: scale(1.04);
+  }
+  .shape-btn:active {
+    transform: scale(0.96);
+  }
+
+  /* Grid 6 Kolom Kotak Warna Node (42 Warna) */
   .color-preset-list {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
     flex: none;
   }
   .node-swatch {
-    height: 20px;
-    border: 1.5px solid rgba(255, 255, 255, 0.85);
-    border-radius: 4px;
+    height: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 3px;
     cursor: pointer;
     padding: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.35);
     transition: transform 0.1s, filter 0.15s, border-color 0.15s;
   }
   .node-swatch:hover {
-    transform: scale(1.08);
+    transform: scale(1.16);
     filter: brightness(1.15);
     border-color: #ffffff;
+    z-index: 2;
   }
   .node-swatch:active {
     transform: scale(0.95);
@@ -550,16 +634,15 @@
   .swatch-action-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    margin-top: 1px;
+    gap: 3px;
   }
   .swatch-action-btn {
-    height: 22px;
+    height: 20px;
     background: #141418;
     border: 1px dashed #6b6b7e;
     border-radius: 4px;
     color: #c7c7d6;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -589,18 +672,18 @@
   .sidebar-divider {
     height: 1px;
     background: var(--border);
-    margin: 4px 0 2px;
+    margin: 2px 0 1px;
   }
   .line-swatch-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
   }
   .line-swatch {
-    height: 18px;
-    border: 1.5px solid #2a2a34;
-    border-radius: 4px;
-    background: #1e1e26;
+    height: 15px;
+    border: 1px solid #2e2e3a;
+    border-radius: 3px;
+    background: #1b1b22;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -611,26 +694,26 @@
   .line-swatch::before {
     content: '';
     display: block;
-    width: 72%;
+    width: 76%;
     height: 3.5px;
     border-radius: 2px;
     background: var(--sw);
   }
-  .line-swatch:hover { transform: scale(1.08); border-color: #fff; }
+  .line-swatch:hover { transform: scale(1.16); border-color: #fff; z-index: 2; }
   .line-swatch:active { transform: scale(0.95); }
   .line-type-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3px;
   }
   .line-type-btn {
-    height: 22px;
+    height: 20px;
     background: #1e1e26;
     border: 1px solid #343442;
     border-radius: 4px;
     color: #c7c7d6;
     font-family: "JetBrains Mono", Menlo, monospace;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     cursor: pointer;
     padding: 0;
@@ -638,12 +721,14 @@
   .line-type-btn::before {
     content: '';
     display: block;
-    width: 64%;
+    width: 68%;
     margin: 0 auto;
     border-top: 2px solid #c7c7d6;
   }
   .line-type-btn[data-arrow="-.->"]::before { border-top-style: dotted; border-top-width: 3px; }
-  .line-type-btn[data-arrow="==>"]::before { border-top-width: 5px; }
+  .line-type-btn[data-arrow="==>"]::before { border-top-width: 4.5px; }
+  .line-type-btn[data-arrow="---"]::before { border-top-width: 1.5px; opacity: 0.75; }
+  .line-type-btn[data-arrow="<-->"]::before { content: '↔'; border: none; width: auto; line-height: 1; font-size: 11px; }
   .line-type-btn:hover { border-color: #fff; color: #fff; }
   .line-type-btn:hover::before { border-top-color: #fff; }
 
@@ -877,13 +962,27 @@
 
 <!-- Main Split Workspace -->
 <main id="workspace">
-  <!-- Kolom Kecil Preset Warna Node & Garis -->
+  <!-- Kolom Cepat: Bentuk Flowchart, Warna Node & Warna Garis -->
   <aside id="color-sidebar">
-    <div class="color-sidebar-title">Warna Node</div>
-    <div class="target-node-box" title="Node yang akan diwarnai (otomatis mengikuti baris kursor atau klik kotak di diagram)">
-      <label for="target-node-select">Target Node:</label>
+    <div class="target-node-box" title="Node aktif untuk disambung panah baru, diubah bentuknya, atau diwarnai (otomatis mengikuti kursor atau klik node di diagram)">
+      <label for="target-node-select">Node:</label>
       <select id="target-node-select"></select>
     </div>
+
+    <div class="color-sidebar-title">+ Node Flowchart</div>
+    <div class="node-mode-bar" id="node-action-bar" title="Pilih aksi saat tombol bentuk diklik">
+      <button class="node-mode-btn active" data-action="link" title="Tambah node baru tersambung panah dari Node aktif (Node --> Baru)">+Panah</button>
+      <button class="node-mode-btn" data-action="standalone" title="Tambah node baru berdiri sendiri di baris baru">+Node</button>
+      <button class="node-mode-btn" data-action="reshape" title="Ubah bentuk Node aktif saat ini tanpa mengganti ID/teksnya">Ubah</button>
+    </div>
+    <div class="node-mode-bar two-col" id="node-naming-bar" title="Pola penamaan ID otomatis saat menambah node baru">
+      <button class="node-mode-btn active" data-naming="alpha" title="Urut abjad A, B, C ... Z lalu A1, A2 ... (Target otomatis maju berantai)">A,B,C…</button>
+      <button class="node-mode-btn" data-naming="branch" title="Cabang dari huruf Node aktif: A1, A2, A3 ... atau D1, D2, D3 ... (Target tetap di induk)">A1,D1…</button>
+    </div>
+    <div class="shape-preset-grid" id="shape-preset-grid"></div>
+
+    <div class="sidebar-divider"></div>
+    <div class="color-sidebar-title">Warna Node</div>
     <div class="color-preset-list" id="color-preset-list"></div>
     <div class="swatch-action-row">
       <label class="swatch-action-btn" title="Pilih warna bebas (Custom) untuk node aktif">
@@ -896,14 +995,16 @@
     <div class="sidebar-divider"></div>
     <div class="color-sidebar-title">Warna Garis</div>
     <div class="target-node-box" title="Garis/panah yang akan diwarnai (otomatis mengikuti kursor di baris panah, atau klik garis di diagram)">
-      <label for="target-edge-select">Target Garis:</label>
+      <label for="target-edge-select">Garis:</label>
       <select id="target-edge-select"></select>
     </div>
     <div class="line-swatch-grid" id="line-swatch-grid"></div>
     <div class="line-type-row">
-      <button class="line-type-btn" data-arrow="-->" title="Garis solid (-->)"></button>
-      <button class="line-type-btn" data-arrow="-.->" title="Garis putus-putus (-.->)"></button>
-      <button class="line-type-btn" data-arrow="==>" title="Garis tebal (==>)"></button>
+      <button class="line-type-btn" data-arrow="-->" title="Panah solid (-->)"></button>
+      <button class="line-type-btn" data-arrow="-.->" title="Panah putus-putus (-.->)"></button>
+      <button class="line-type-btn" data-arrow="==>" title="Panah tebal (==>)"></button>
+      <button class="line-type-btn" data-arrow="---" title="Garis tanpa kepala panah (---)"></button>
+      <button class="line-type-btn" data-arrow="<-->" title="Panah dua arah (<-->)"></button>
     </div>
     <div class="swatch-action-row">
       <label class="swatch-action-btn" title="Pilih warna bebas (Custom) untuk garis aktif">
@@ -1113,36 +1214,74 @@
   const colorPresetList = document.getElementById('color-preset-list');
 
   const COLOR_PRESETS = [
-    // Baris 1: Merah → Pink
-    { code: 'MT', name: 'Merah Tua',  fill: '#7f1d1d' },
-    { code: 'M',  name: 'Merah',      fill: '#b91c1c' },
-    { code: 'MR', name: 'Crimson',    fill: '#e11d48' },
-    { code: 'P',  name: 'Pink',       fill: '#be185d' },
-    // Baris 2: Cokelat → Kuning
-    { code: 'CK', name: 'Cokelat',    fill: '#78350f' },
-    { code: 'O',  name: 'Oranye',     fill: '#c2410c' },
-    { code: 'AM', name: 'Amber',      fill: '#b45309' },
-    { code: 'K',  name: 'Kuning',     fill: '#a16207' },
-    // Baris 3: Lime → Tosca
-    { code: 'LM', name: 'Lime',       fill: '#3f6212' },
-    { code: 'H',  name: 'Hijau',      fill: '#15803d' },
-    { code: 'EM', name: 'Emerald',    fill: '#047857' },
-    { code: 'T',  name: 'Tosca',      fill: '#0f766e' },
-    // Baris 4: Cyan → Navy
-    { code: 'C',  name: 'Cyan',       fill: '#0e7490' },
-    { code: 'SK', name: 'Sky',        fill: '#0369a1' },
-    { code: 'B',  name: 'Biru',       fill: '#1d4ed8' },
-    { code: 'NV', name: 'Navy',       fill: '#1e3a8a' },
-    // Baris 5: Indigo → Magenta
-    { code: 'I',  name: 'Indigo',     fill: '#4338ca' },
-    { code: 'U',  name: 'Ungu',       fill: '#6d28d9' },
-    { code: 'PR', name: 'Purple',     fill: '#7e22ce' },
-    { code: 'MG', name: 'Magenta',    fill: '#a21caf' },
-    // Baris 6: Earth & Neutral
-    { code: 'BZ', name: 'Bronze',     fill: '#57534e' },
-    { code: 'SL', name: 'Slate',      fill: '#475569' },
-    { code: 'A',  name: 'Abu',        fill: '#374151' },
-    { code: 'HT', name: 'Hitam',      fill: '#18181b' }
+    // Baris 1: Maroon, Merah, Crimson, Rose, Pink
+    { code: 'M1',  name: 'Maroon',       fill: '#450a0a' },
+    { code: 'MT',  name: 'Merah Tua',    fill: '#7f1d1d' },
+    { code: 'M',   name: 'Merah',        fill: '#b91c1c' },
+    { code: 'MC',  name: 'Merah Cerah',  fill: '#dc2626' },
+    { code: 'MR',  name: 'Crimson',      fill: '#e11d48' },
+    { code: 'P',   name: 'Pink',         fill: '#db2777' },
+    // Baris 2: Espresso, Cokelat, Oranye, Amber, Kuning
+    { code: 'CK2', name: 'Espresso',     fill: '#451a03' },
+    { code: 'CK',  name: 'Cokelat',      fill: '#78350f' },
+    { code: 'O',   name: 'Oranye Tua',   fill: '#c2410c' },
+    { code: 'OC',  name: 'Oranye',       fill: '#ea580c' },
+    { code: 'AM',  name: 'Amber',        fill: '#d97706' },
+    { code: 'K',   name: 'Kuning',       fill: '#ca8a04' },
+    // Baris 3: Hijau Hutan → Lime
+    { code: 'H1',  name: 'Hijau Hutan',  fill: '#14532d' },
+    { code: 'H',   name: 'Hijau Tua',    fill: '#15803d' },
+    { code: 'HC',  name: 'Hijau',        fill: '#16a34a' },
+    { code: 'HM',  name: 'Hijau Muda',   fill: '#22c55e' },
+    { code: 'LM',  name: 'Lime Tua',     fill: '#3f6212' },
+    { code: 'LC',  name: 'Lime',         fill: '#65a30d' },
+    // Baris 4: Teal, Emerald, Tosca, Cyan
+    { code: 'T1',  name: 'Teal Gelap',   fill: '#134e4a' },
+    { code: 'EM',  name: 'Emerald',      fill: '#047857' },
+    { code: 'T',   name: 'Tosca',        fill: '#0f766e' },
+    { code: 'TC',  name: 'Tosca Cerah',  fill: '#0d9488' },
+    { code: 'C',   name: 'Cyan',         fill: '#0e7490' },
+    { code: 'CC',  name: 'Cyan Cerah',   fill: '#0891b2' },
+    // Baris 5: Navy, Biru, Sky
+    { code: 'NV2', name: 'Navy Gelap',   fill: '#172554' },
+    { code: 'NV',  name: 'Navy',         fill: '#1e3a8a' },
+    { code: 'B',   name: 'Biru',         fill: '#1d4ed8' },
+    { code: 'BC',  name: 'Biru Cerah',   fill: '#2563eb' },
+    { code: 'SK',  name: 'Sky',          fill: '#0369a1' },
+    { code: 'SC',  name: 'Sky Cerah',    fill: '#0284c7' },
+    // Baris 6: Indigo, Ungu, Purple, Magenta
+    { code: 'I1',  name: 'Indigo Gelap', fill: '#1e1b4b' },
+    { code: 'I',   name: 'Indigo',       fill: '#4338ca' },
+    { code: 'U',   name: 'Ungu',         fill: '#6d28d9' },
+    { code: 'UC',  name: 'Ungu Cerah',   fill: '#7c3aed' },
+    { code: 'PR',  name: 'Purple',       fill: '#9333ea' },
+    { code: 'MG',  name: 'Magenta',      fill: '#c026d3' },
+    // Baris 7: Monokrom & Netral (Hitam → Putih)
+    { code: 'HT',  name: 'Hitam',        fill: '#18181b' },
+    { code: 'A',   name: 'Abu Tua',      fill: '#374151' },
+    { code: 'SL',  name: 'Slate',        fill: '#475569' },
+    { code: 'BZ',  name: 'Bronze',       fill: '#57534e' },
+    { code: 'ABM', name: 'Abu Muda',     fill: '#94a3b8' },
+    { code: 'PT',  name: 'Putih',        fill: '#f8fafc' }
+  ];
+
+  // Semua 14 bentuk node standar Mermaid Flowchart + Subgraph
+  const NODE_SHAPES = [
+    { id: 'rect',       label: '[]',   title: 'Kotak / Proses — id[Teks]',                   open: '[',   close: ']',   svg: '<rect x="2" y="2.5" width="16" height="11" rx="1"/>' },
+    { id: 'round',      label: '()',   title: 'Sudut Tumpul / Event — id(Teks)',             open: '(',   close: ')',   svg: '<rect x="2" y="2.5" width="16" height="11" rx="3.5"/>' },
+    { id: 'stadium',    label: '([])', title: 'Terminal / Mulai-Selesai — id([Teks])',       open: '([',  close: '])',  svg: '<rect x="1.5" y="2.5" width="17" height="11" rx="5.5"/>' },
+    { id: 'diamond',    label: '{}',   title: 'Keputusan / Kondisi (Diamond) — id{Teks}',    open: '{',   close: '}',   svg: '<polygon points="10,1.5 18.5,8 10,14.5 1.5,8"/>' },
+    { id: 'lean_r',     label: '[/]',  title: 'Input / Output (Jajar Genjang) — id[/Teks/]', open: '[/',  close: '/]',  svg: '<polygon points="5,2.5 18.5,2.5 15,13.5 1.5,13.5"/>' },
+    { id: 'lean_l',     label: '[\\]', title: 'Output / Input Kiri — id[\\Teks\\]',          open: '[\\', close: '\\]', svg: '<polygon points="1.5,2.5 15,2.5 18.5,13.5 5,13.5"/>' },
+    { id: 'cyl',        label: '[()]', title: 'Database / Silinder — id[(Teks)]',            open: '[(',  close: ')]',  svg: '<path d="M3,4.5 C3,2.5 17,2.5 17,4.5 L17,11.5 C17,13.5 3,13.5 3,11.5 Z M3,4.5 C3,6.2 17,6.2 17,4.5"/>' },
+    { id: 'subroutine', label: '[[]]', title: 'Subrutin / Subproses — id[[Teks]]',           open: '[[',  close: ']]',  svg: '<rect x="2" y="2.5" width="16" height="11"/><line x1="5" y1="2.5" x2="5" y2="13.5"/><line x1="15" y1="2.5" x2="15" y2="13.5"/>' },
+    { id: 'circle',     label: '(())', title: 'Lingkaran / Konektor — id((Teks))',           open: '((',  close: '))',  svg: '<circle cx="10" cy="8" r="6"/>' },
+    { id: 'dbl_circle', label: '((•))',title: 'Lingkaran Ganda / Stop — id(((Teks)))',       open: '(((', close: ')))', svg: '<circle cx="10" cy="8" r="6.3"/><circle cx="10" cy="8" r="4.1"/>' },
+    { id: 'hex',        label: '{{}}', title: 'Heksagon / Persiapan — id{{Teks}}',           open: '{{',  close: '}}',  svg: '<polygon points="5,2.5 15,2.5 18.5,8 15,13.5 5,13.5 1.5,8"/>' },
+    { id: 'trap_b',     label: '[/\\]',title: 'Trapesium / Operasi Manual — id[/Teks\\]',    open: '[/',  close: '\\]', svg: '<polygon points="5,2.5 15,2.5 18.5,13.5 1.5,13.5"/>' },
+    { id: 'trap_t',     label: '[\\/]',title: 'Trapesium Balik / Manual Loop — id[\\Teks/]', open: '[\\', close: '/]',  svg: '<polygon points="1.5,2.5 18.5,2.5 15,13.5 5,13.5"/>' },
+    { id: 'asym',       label: '>]',   title: 'Bendera / Sinyal Asimetris — id>Teks]',       open: '>',   close: ']',   svg: '<polygon points="1.5,2.5 18,2.5 18,13.5 1.5,13.5 5.5,8"/>' },
+    { id: 'subgraph',   label: 'Sub',  title: 'Tambah blok Subgraph (subgraph ... end)',     isSubgraph: true,          svg: '<rect x="1.5" y="2" width="17" height="12" rx="1.5" stroke-dasharray="2.5,1.5"/><line x1="1.5" y1="5.5" x2="18.5" y2="5.5"/>' }
   ];
 
   const RESERVED_WORDS = new Set([
@@ -1157,6 +1296,8 @@
   let renderCounter = 0;
   let isFirstRender = true;
   let currentTargetNode = 'A';
+  let nodeActionMode = 'link';   // 'link' (+Panah) | 'standalone' (+Node) | 'reshape' (Ubah)
+  let nodeNamingMode = 'alpha';  // 'alpha' (A,B,C...) | 'branch' (A1,A2... / D1,D2...)
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -1185,13 +1326,17 @@
       return empty;
     }
 
-    // Mask out edge labels |...|, node shapes [...], (...), {...}, and :::class
+    // Mask out edge labels |...|, asymmetric node >...], nested [...], (...), {...}, and :::class
     let masked = noComment
       .replace(/\|[^|]*\|/g, m => ' '.repeat(m.length))
-      .replace(/\[[^\]]*\]/g, m => ' '.repeat(m.length))
-      .replace(/\([^)]*\)/g, m => ' '.repeat(m.length))
-      .replace(/\{[^}]*\}/g, m => ' '.repeat(m.length))
-      .replace(/:::[A-Za-z0-9_-]+/g, m => ' '.repeat(m.length));
+      .replace(/(?<=\b[A-Za-z_][A-Za-z0-9_]*)>[^\]]*\]/g, m => ' '.repeat(m.length));
+    for (let pass = 0; pass < 3; pass++) {
+      masked = masked
+        .replace(/\[[^\[\]]*\]/g, m => ' '.repeat(m.length))
+        .replace(/\([^()]*\)/g, m => ' '.repeat(m.length))
+        .replace(/\{[^{}]*\}/g, m => ' '.repeat(m.length));
+    }
+    masked = masked.replace(/:::[A-Za-z0-9_-]+/g, m => ' '.repeat(m.length));
 
     // Cari token panah
     const rawTokens = [];
@@ -1290,6 +1435,187 @@
     currentTargetNode = targetNodeSelect.value;
   });
 
+  // ===== Tambah Node Baru & Ubah Bentuk Node Flowchart =====
+  function getAllUsedIds() {
+    const used = new Set(RESERVED_WORDS);
+    mermaidCode.split('\n').forEach(line => {
+      extractNodesFromLine(line).forEach(n => used.add(n.id));
+      tokenizeFlowLine(line).edges.forEach(e => { if (e.id) used.add(e.id); });
+      const sg = line.match(/^\s*subgraph\s+([A-Za-z_][\w-]*)/);
+      if (sg) used.add(sg[1]);
+    });
+    return used;
+  }
+
+  // Hasilkan ID node otomatis:
+  // - mode 'alpha': A, B, C ... Z, lalu A1, A2, A3 ...
+  // - mode 'branch': mengikuti huruf Node aktif → A1, A2, A3 ... atau D1, D2, D3 ...
+  function getNextAutoNodeId(parentId, mode) {
+    const used = getAllUsedIds();
+    if (mode === 'branch' && parentId) {
+      const prefix = (parentId.match(/^[A-Za-z]+/) || ['A'])[0];
+      for (let n = 1; n <= 999; n++) {
+        const cand = `${prefix}${n}`;
+        if (!used.has(cand)) return cand;
+      }
+    }
+    // Mode 'alpha': cari A..Z yang belum terpakai
+    for (let c = 65; c <= 90; c++) {
+      const letter = String.fromCharCode(c);
+      if (!used.has(letter)) return letter;
+    }
+    // Jika A..Z penuh, lanjutkan A1, A2 ... atau mengikuti huruf parent
+    const fallbackPrefix = (parentId && (parentId.match(/^[A-Za-z]+/) || [])[0]) || 'A';
+    for (let n = 1; n <= 999; n++) {
+      const cand = `${fallbackPrefix}${n}`;
+      if (!used.has(cand)) return cand;
+    }
+    return `N${Date.now() % 1000}`;
+  }
+
+  // Cari baris tempat menyisipkan node/edge baru (sebelum blok style/classDef/class/linkStyle di bagian bawah)
+  function findFlowInsertIndex(lines) {
+    let idx = lines.length;
+    while (idx > 0 && lines[idx - 1].trim() === '') idx--;
+    while (idx > 0 && /^\s*(style|classDef|class|linkStyle)\b/.test(lines[idx - 1])) {
+      idx--;
+    }
+    return idx;
+  }
+
+  // Regex untuk mencocokkan bentuk node yang menempel pada suatu Node ID (urut dari kurung terdalam/terpanjang)
+  function buildNodeShapeRegex(nodeId) {
+    const id = escRe(nodeId);
+    return new RegExp(
+      `(^|[^A-Za-z0-9_-])(${id})(?:` +
+      `\\({3}([^()]*)\\){3}|` +
+      `\\({2}([^()]*)\\){2}|` +
+      `\\[\\(([^()]*)\\)\\]|` +
+      `\\(\\[([^\\[\\]]*)\\]\\)|` +
+      `\\[{2}([^\\[\\]]*)\\]{2}|` +
+      `\\{{2}([^{}]*)\\}{2}|` +
+      `\\[\\/([^\\[\\]]*)\\/\\]|` +
+      `\\[\\\\([^\\[\\]]*)\\\\\\]|` +
+      `\\[\\/([^\\[\\]]*)\\\\\\]|` +
+      `\\[\\\\([^\\[\\]]*)\\/\\]|` +
+      `>([^\\]]*)\\]|` +
+      `\\[([^\\[\\]]*)\\]|` +
+      `\\(([^()]*)\\)|` +
+      `\\{([^{}]*)\\}` +
+      `)`
+    );
+  }
+
+  function handleShapeButtonClick(shape) {
+    if (!isFlowchartCode()) {
+      showToast('Tombol bentuk node khusus untuk diagram Flowchart');
+      return;
+    }
+    refreshNodeDropdown();
+    const parentId = targetNodeSelect.value || currentTargetNode;
+    const lines = mermaidCode.split('\n');
+
+    // Jika tombol Subgraph diklik
+    if (shape.isSubgraph) {
+      const used = getAllUsedIds();
+      let sgNum = 1;
+      while (used.has(`SG${sgNum}`)) sgNum++;
+      const sgId = `SG${sgNum}`;
+      const childId = getNextAutoNodeId(parentId, nodeNamingMode);
+      const insertAt = findFlowInsertIndex(lines);
+      lines.splice(insertAt, 0, `    subgraph ${sgId} [Grup ${sgNum}]`, `        ${childId}[${childId}]`, `    end`);
+      currentTargetNode = childId;
+      commitCodeChange(lines, `Subgraph ${sgId} (${childId}) ditambahkan`);
+      refreshNodeDropdown(childId);
+      return;
+    }
+
+    // Mode 1: Ubah bentuk node aktif saat ini
+    if (nodeActionMode === 'reshape') {
+      if (!parentId) {
+        showToast('Pilih node terlebih dahulu untuk diubah bentuknya');
+        return;
+      }
+      const shapeRe = buildNodeShapeRegex(parentId);
+      let reshaped = false;
+      for (let i = 0; i < lines.length; i++) {
+        if (/^\s*(flowchart|graph|subgraph|end|direction|style|classDef|class|click|linkStyle|%%)\b/.test(lines[i])) continue;
+        const m = lines[i].match(shapeRe);
+        if (m) {
+          const prefixChar = m[1] || '';
+          const oldLabel = m.slice(3).find(v => v !== undefined) || parentId;
+          lines[i] = lines[i].replace(shapeRe, `${prefixChar}${parentId}${shape.open}${oldLabel}${shape.close}`);
+          reshaped = true;
+          break;
+        }
+      }
+      if (!reshaped) {
+        // Jika node sebelumnya ditulis polos tanpa kurung bentuk (mis. "A --> B")
+        const bareRe = new RegExp(`(^|[^A-Za-z0-9_-])(${escRe(parentId)})(?![A-Za-z0-9_@(\\[{>-])`);
+        for (let i = 0; i < lines.length; i++) {
+          if (/^\s*(flowchart|graph|subgraph|end|direction|style|classDef|class|click|linkStyle|%%)\b/.test(lines[i])) continue;
+          if (bareRe.test(lines[i])) {
+            lines[i] = lines[i].replace(bareRe, `$1$2${shape.open}${parentId}${shape.close}`);
+            reshaped = true;
+            break;
+          }
+        }
+      }
+      commitCodeChange(lines, `Bentuk node "${parentId}" → ${shape.open}…${shape.close}`);
+      return;
+    }
+
+    // Mode 2 & 3: Tambah node baru (+Panah dari Node aktif, atau +Node mandiri)
+    const newId = getNextAutoNodeId(parentId, nodeNamingMode);
+    const nodeToken = `${newId}${shape.open}${newId}${shape.close}`;
+    const newLine = (nodeActionMode === 'link' && parentId)
+      ? `    ${parentId} --> ${nodeToken}`
+      : `    ${nodeToken}`;
+
+    const insertAt = findFlowInsertIndex(lines);
+    lines.splice(insertAt, 0, newLine);
+
+    // Pada mode A,B,C (alpha), majukan Target Node ke node baru agar klik berikutnya berantai.
+    // Pada mode A1,D1 (branch), pertahankan Target Node di induk agar klik berikutnya membuat cabang saudara (D1, D2, D3...).
+    const nextTarget = (nodeNamingMode === 'branch' && parentId && nodeActionMode === 'link')
+      ? parentId
+      : newId;
+    currentTargetNode = nextTarget;
+    const msg = (nodeActionMode === 'link' && parentId)
+      ? `Ditambahkan: ${parentId} → ${nodeToken}`
+      : `Ditambahkan: ${nodeToken}`;
+    commitCodeChange(lines, msg);
+    refreshNodeDropdown(nextTarget);
+  }
+
+  function initShapePresetButtons() {
+    const grid = document.getElementById('shape-preset-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    NODE_SHAPES.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'shape-btn';
+      btn.title = s.title;
+      btn.innerHTML = `<svg viewBox="0 0 20 16" aria-hidden="true">${s.svg}</svg><span>${s.label}</span>`;
+      btn.onclick = () => handleShapeButtonClick(s);
+      grid.appendChild(btn);
+    });
+
+    document.querySelectorAll('#node-action-bar .node-mode-btn').forEach(btn => {
+      btn.onclick = () => {
+        nodeActionMode = btn.dataset.action;
+        document.querySelectorAll('#node-action-bar .node-mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+      };
+    });
+    document.querySelectorAll('#node-naming-bar .node-mode-btn').forEach(btn => {
+      btn.onclick = () => {
+        nodeNamingMode = btn.dataset.naming;
+        document.querySelectorAll('#node-naming-bar .node-mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+      };
+    });
+  }
+  initShapePresetButtons();
+
   function isLightHex(hex) {
     const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
     if (!m) return false;
@@ -1370,38 +1696,50 @@
   initColorPresetButtons();
 
   // ===== Warna & Gaya Garis — berbasis Edge ID (A e_A_B@--> B), BUKAN nomor linkStyle =====
-  // 24 warna garis (lebih terang agar kontras di kanvas gelap)
+  // 36 warna garis (6x6 spektrum lengkap, kontras di kanvas gelap maupun terang)
   const LINE_PRESETS = [
-    // Baris 1: Merah → Pink
-    { name: 'MerahTua',  label: 'Merah Tua',  color: '#dc2626' },
-    { name: 'Merah',     label: 'Merah',      color: '#ef4444' },
-    { name: 'Rose',      label: 'Rose',       color: '#fb7185' },
-    { name: 'Pink',      label: 'Pink',       color: '#ec4899' },
+    // Baris 1: Maroon → Pink
+    { name: 'Maroon',    label: 'Maroon',      color: '#991b1b' },
+    { name: 'MerahTua',  label: 'Merah Tua',   color: '#dc2626' },
+    { name: 'Merah',     label: 'Merah',       color: '#ef4444' },
+    { name: 'Coral',     label: 'Coral',       color: '#f87171' },
+    { name: 'Rose',      label: 'Rose',        color: '#fb7185' },
+    { name: 'Pink',      label: 'Pink',        color: '#f472b6' },
     // Baris 2: Cokelat → Kuning
-    { name: 'Cokelat',   label: 'Cokelat',    color: '#b45309' },
-    { name: 'Oranye',    label: 'Oranye',     color: '#f97316' },
-    { name: 'Amber',     label: 'Amber',      color: '#f59e0b' },
-    { name: 'Kuning',    label: 'Kuning',     color: '#eab308' },
-    // Baris 3: Lime → Tosca
-    { name: 'Lime',      label: 'Lime',       color: '#84cc16' },
-    { name: 'Hijau',     label: 'Hijau',      color: '#22c55e' },
-    { name: 'Emerald',   label: 'Emerald',    color: '#10b981' },
-    { name: 'Tosca',     label: 'Tosca',      color: '#14b8a6' },
-    // Baris 4: Cyan → Biru Muda
-    { name: 'Cyan',      label: 'Cyan',       color: '#06b6d4' },
-    { name: 'Sky',       label: 'Sky',        color: '#38bdf8' },
-    { name: 'Biru',      label: 'Biru',       color: '#3b82f6' },
-    { name: 'BiruMuda',  label: 'Biru Muda',  color: '#60a5fa' },
-    // Baris 5: Indigo → Magenta
-    { name: 'Indigo',    label: 'Indigo',     color: '#818cf8' },
-    { name: 'Ungu',      label: 'Ungu',       color: '#a855f7' },
-    { name: 'Purple',    label: 'Purple',     color: '#c084fc' },
-    { name: 'Magenta',   label: 'Magenta',    color: '#e879f9' },
-    // Baris 6: Gold, Slate, Abu, Putih
-    { name: 'Gold',      label: 'Gold',       color: '#fbbf24' },
-    { name: 'Slate',     label: 'Slate',      color: '#94a3b8' },
-    { name: 'Abu',       label: 'Abu',        color: '#6b7280' },
-    { name: 'Putih',     label: 'Putih',      color: '#ffffff' }
+    { name: 'Cokelat',   label: 'Cokelat',     color: '#a16207' },
+    { name: 'OranyeTua', label: 'Oranye Tua',  color: '#ea580c' },
+    { name: 'Oranye',    label: 'Oranye',      color: '#f97316' },
+    { name: 'Amber',     label: 'Amber',       color: '#f59e0b' },
+    { name: 'Gold',      label: 'Gold',        color: '#fbbf24' },
+    { name: 'Kuning',    label: 'Kuning',      color: '#fde047' },
+    // Baris 3: Olive → Mint
+    { name: 'Olive',     label: 'Olive',       color: '#65a30d' },
+    { name: 'Lime',      label: 'Lime',        color: '#84cc16' },
+    { name: 'LimeMuda',  label: 'Lime Muda',   color: '#a3e635' },
+    { name: 'HijauTua',  label: 'Hijau Tua',   color: '#16a34a' },
+    { name: 'Hijau',     label: 'Hijau',       color: '#22c55e' },
+    { name: 'Mint',      label: 'Mint',        color: '#4ade80' },
+    // Baris 4: Emerald → Sky
+    { name: 'Emerald',   label: 'Emerald',     color: '#10b981' },
+    { name: 'Tosca',     label: 'Tosca',       color: '#14b8a6' },
+    { name: 'Aqua',      label: 'Aqua',        color: '#2dd4bf' },
+    { name: 'Cyan',      label: 'Cyan',        color: '#06b6d4' },
+    { name: 'CyanMuda',  label: 'Cyan Muda',   color: '#22d3ee' },
+    { name: 'Sky',       label: 'Sky',         color: '#38bdf8' },
+    // Baris 5: Biru Tua → Magenta
+    { name: 'BiruTua',   label: 'Biru Tua',    color: '#2563eb' },
+    { name: 'Biru',      label: 'Biru',        color: '#3b82f6' },
+    { name: 'BiruMuda',  label: 'Biru Muda',   color: '#60a5fa' },
+    { name: 'Indigo',    label: 'Indigo',      color: '#818cf8' },
+    { name: 'Ungu',      label: 'Ungu',        color: '#a855f7' },
+    { name: 'Magenta',   label: 'Magenta',     color: '#e879f9' },
+    // Baris 6: Fuchsia & Monokrom (Bronze → Putih)
+    { name: 'Fuchsia',   label: 'Fuchsia',     color: '#f0abfc' },
+    { name: 'Bronze',    label: 'Bronze',      color: '#a8a29e' },
+    { name: 'AbuTua',    label: 'Abu Tua',     color: '#6b7280' },
+    { name: 'Abu',       label: 'Abu',         color: '#9ca3af' },
+    { name: 'Perak',     label: 'Perak',       color: '#cbd5e1' },
+    { name: 'Putih',     label: 'Putih',       color: '#ffffff' }
   ];
   const targetEdgeSelect = document.getElementById('target-edge-select');
   const lineSwatchGrid = document.getElementById('line-swatch-grid');
@@ -1532,22 +1870,32 @@
     commitCodeChange(lines, `Garis ${label} → ${preset.label || preset.color}`);
   }
 
-  // Ganti tipe garis langsung di sintaks panah: solid (-->), putus-putus (-.->), tebal (==>)
+  // Ganti tipe garis langsung di sintaks panah: solid (-->), putus-putus (-.->), tebal (==>), tanpa panah (---), dua arah (<-->)
   function applyEdgeType(kind) {
     const { edge } = getTargetEdge();
     if (!edge) return;
     const lines = mermaidCode.split('\n');
-    const lastChar = (edge.close || edge.arrow).slice(-1);
-    const head = '>xo'.includes(lastChar) ? lastChar : '';
-    const bidir = edge.arrow.startsWith('<');
-    const body = head
-      ? { solid: '--', dashed: '-.-', thick: '==' }[kind]
-      : { solid: '---', dashed: '-.-', thick: '===' }[kind];
-    const newArrow = (bidir ? '<' : '') + body + head;
+    const curArrow = edge.close || edge.arrow;
+    const lastChar = curArrow.slice(-1);
+    const curHasHead = '>xo'.includes(lastChar);
+    const curIsDashed = curArrow.includes('.');
+    const curIsThick = curArrow.includes('=');
+
+    let newArrow;
+    if (kind === 'nohead') {
+      newArrow = curIsDashed ? '-.-' : (curIsThick ? '===' : '---');
+    } else if (kind === 'bidir') {
+      newArrow = curIsDashed ? '<-.->' : (curIsThick ? '<==>' : '<-->');
+    } else {
+      const head = curHasHead ? lastChar : '>';
+      const bidir = edge.arrow.startsWith('<');
+      const body = { solid: '--', dashed: '-.-', thick: '==' }[kind];
+      newArrow = (bidir ? '<' : '') + body + head;
+    }
     const repl = newArrow + (edge.inlineText ? `|${edge.inlineText}|` : '');
     const ln = lines[edge.lineIdx];
     lines[edge.lineIdx] = ln.slice(0, edge.arrowStart) + repl + ln.slice(edge.end);
-    const names = { solid: 'solid', dashed: 'putus-putus', thick: 'tebal' };
+    const names = { solid: 'solid (-->)', dashed: 'putus-putus (-.->)', thick: 'tebal (==>)', nohead: 'tanpa panah (---)', bidir: 'dua arah (<-->)' };
     commitCodeChange(lines, `Garis ${edge.src || '?'}→${edge.dst || '?'} → ${names[kind]}`);
   }
 
@@ -1561,7 +1909,7 @@
       btn.onclick = () => applyEdgeColor(p);
       lineSwatchGrid.appendChild(btn);
     });
-    const kindOf = { '-->': 'solid', '-.->': 'dashed', '==>': 'thick' };
+    const kindOf = { '-->': 'solid', '-.->': 'dashed', '==>': 'thick', '---': 'nohead', '<-->': 'bidir' };
     document.querySelectorAll('.line-type-btn').forEach(b => {
       b.onclick = () => applyEdgeType(kindOf[b.dataset.arrow]);
     });
@@ -1858,11 +2206,11 @@
         securityLevel: 'antiscript'
       });
 
-      // Support built-in shorthand mnemonics (e.g. :::M, :::B, :::H) if used in flowchart
+      // Support built-in shorthand mnemonics (e.g. :::M, :::B, :::H, :::M1, :::PT) if used in flowchart
       let codeToRender = mermaidCode;
-      if (/^\s*(flowchart|graph)\b/m.test(mermaidCode) && /:::[A-Za-z]+/.test(mermaidCode)) {
+      if (/^\s*(flowchart|graph)\b/m.test(mermaidCode) && /:::[A-Za-z0-9_]+/.test(mermaidCode)) {
         const mnemonicDefs = COLOR_PRESETS
-          .map(p => `    classDef ${p.code} fill:${p.fill},stroke:#fff,stroke-width:2px,color:#fff`)
+          .map(p => `    classDef ${p.code} fill:${p.fill},stroke:#fff,stroke-width:2px,color:${isLightHex(p.fill) ? '#111827' : '#fff'}`)
           .join('\n');
         codeToRender = `${mermaidCode}\n${mnemonicDefs}\n`;
       }

@@ -229,7 +229,8 @@
     border: none;
     outline: none;
     resize: none;
-    padding: 14px 14px;
+    padding: 14px 14px 14px calc(14px + 4ch);
+    text-indent: -4ch each-line;
     background: transparent;
     color: #f1f1f7;
     font-family: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
@@ -1049,7 +1050,7 @@
 
     <div class="editor-wrap">
       <div class="line-numbers" id="line-numbers">1</div>
-      <textarea id="code-editor" class="code-textarea" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+      <div id="code-editor" class="code-textarea" contenteditable="plaintext-only" spellcheck="false" autocomplete="off" autocapitalize="off"></div>
     </div>
 
     <div id="error-banner"></div>
@@ -1163,51 +1164,129 @@
 
   const SAMPLES = {
     christmas: `flowchart TD
-    A[Christmas] -->|Get money| B(Go shopping)
-    B --> C{Let me think}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]`,
+A[Christmas] -->|Get money| B(Go shopping)
+B --> C{Let me think}
+C -->|One| D[Laptop]
+C -->|Two| E[iPhone]
+C -->|Three| F[fa:fa-car Car]`,
     sequence: `sequenceDiagram
-    autonumber
-    Alice->>John: Hello John, how are you?
-    loop HealthCheck
-        John->>John: Fight against hypochondria
-    end
-    Note right of John: Rational thoughts!
-    John-->>Alice: Great!
-    John->>Bob: How about you?
-    Bob-->>John: Jolly good!`,
+autonumber
+Alice->>John: Hello John, how are you?
+loop HealthCheck
+John->>John: Fight against hypochondria
+end
+Note right of John: Rational thoughts!
+John-->>Alice: Great!
+John->>Bob: How about you?
+Bob-->>John: Jolly good!`,
     state: `stateDiagram-v2
-    [*] --> Still
-    Still --> [*]
-    Still --> Moving
-    Moving --> Still
-    Moving --> Crash
-    Crash --> [*]`,
+[*] --> Still
+Still --> [*]
+Still --> Moving
+Moving --> Still
+Moving --> Crash
+Crash --> [*]`,
     class: `classDiagram
-    Animal <|-- Duck
-    Animal <|-- Fish
-    Animal <|-- Zebra
-    Animal : +int age
-    Animal : +String gender
-    Animal: +isMammal()
-    class Duck{
-      +String beakColor
-      +swim()
-      +quack()
-    }`,
+Animal <|-- Duck
+Animal <|-- Fish
+Animal <|-- Zebra
+Animal : +int age
+Animal : +String gender
+Animal: +isMammal()
+class Duck{
++String beakColor
++swim()
++quack()
+}`,
     er: `erDiagram
-    CUSTOMER ||--o{ ORDER : places
-    ORDER ||--|{ LINE-ITEM : contains
-    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses`
+CUSTOMER ||--o{ ORDER : places
+ORDER ||--|{ LINE-ITEM : contains
+CUSTOMER }|..|{ DELIVERY-ADDRESS : uses`
   };
 
   let activeTab = 'code';
-  let mermaidCode = SAMPLES.christmas + '\n  ';
+  let mermaidCode = SAMPLES.christmas + '\n';
   let configCode = JSON.stringify({ theme: 'redux-dark-color' }, null, 2);
 
   const editor = document.getElementById('code-editor');
+
+  function getEditorTextOffset(root, node, offset) {
+    let pos = 0;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let cur;
+    while ((cur = walker.nextNode())) {
+      if (cur === node) return pos + offset;
+      pos += cur.nodeValue.length;
+    }
+    if (node === root) {
+      for (let i = 0; i < offset && i < root.childNodes.length; i++) {
+        pos += (root.childNodes[i].textContent || '').length;
+      }
+      return pos;
+    }
+    return pos;
+  }
+
+  function setEditorCaretOffset(root, targetOffset) {
+    const sel = window.getSelection();
+    if (!sel) return;
+    const range = document.createRange();
+    let pos = 0;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let cur, lastText = null;
+    while ((cur = walker.nextNode())) {
+      lastText = cur;
+      const len = cur.nodeValue.length;
+      if (pos + len >= targetOffset) {
+        range.setStart(cur, Math.max(0, targetOffset - pos));
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        return;
+      }
+      pos += len;
+    }
+    if (lastText) {
+      range.setStart(lastText, lastText.nodeValue.length);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+
+  Object.defineProperty(editor, 'value', {
+    get() {
+      return (this.textContent || '').replace(/\n$/, '');
+    },
+    set(v) {
+      const s = String(v ?? '');
+      this.textContent = s.endsWith('\n') ? s + '\n' : s;
+    }
+  });
+
+  Object.defineProperty(editor, 'selectionStart', {
+    get() {
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount || !this.contains(sel.anchorNode)) return 0;
+      const r = sel.getRangeAt(0);
+      return Math.min(this.value.length, getEditorTextOffset(this, r.startContainer, r.startOffset));
+    },
+    set(v) {
+      setEditorCaretOffset(this, Math.max(0, Math.min(this.value.length, Number(v) || 0)));
+    }
+  });
+
+  Object.defineProperty(editor, 'selectionEnd', {
+    get() {
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount || !this.contains(sel.focusNode)) return 0;
+      const r = sel.getRangeAt(0);
+      return Math.min(this.value.length, getEditorTextOffset(this, r.endContainer, r.endOffset));
+    },
+    set(v) {
+      setEditorCaretOffset(this, Math.max(0, Math.min(this.value.length, Number(v) || 0)));
+    }
+  });
   const lineNumbers = document.getElementById('line-numbers');
   const errorBanner = document.getElementById('error-banner');
   const statusDot = document.getElementById('status-dot');
@@ -1532,7 +1611,7 @@
       const sgId = `SG${sgNum}`;
       const childId = getNextAutoNodeId(parentId, nodeNamingMode);
       const insertAt = findFlowInsertIndex(lines);
-      lines.splice(insertAt, 0, `    subgraph ${sgId} [Grup ${sgNum}]`, `        ${childId}[${childId}]`, `    end`);
+      lines.splice(insertAt, 0, `subgraph ${sgId} [Grup ${sgNum}]`, `${childId}[${childId}]`, `end`);
       currentTargetNode = childId;
       commitCodeChange(lines, `Subgraph ${sgId} (${childId}) ditambahkan`);
       refreshNodeDropdown(childId);
@@ -1574,12 +1653,12 @@
       return;
     }
 
-    // Mode 2 & 3: Tambah node baru (+Panah dari Node aktif, atau +Node mandiri)
+    // Mode 2 & 3: Tambah node baru (+Panah dari Node aktif, atau +Node mandiri) — rata kiri (zero tab)
     const newId = getNextAutoNodeId(parentId, nodeNamingMode);
     const nodeToken = `${newId}${shape.open}${newId}${shape.close}`;
     const newLine = (nodeActionMode === 'link' && parentId)
-      ? `    ${parentId} --> ${nodeToken}`
-      : `    ${nodeToken}`;
+      ? `${parentId} --> ${nodeToken}`
+      : `${nodeToken}`;
 
     const insertAt = findFlowInsertIndex(lines);
     lines.splice(insertAt, 0, newLine);
@@ -1651,7 +1730,7 @@
       showToast(`Warna node "${nodeId}" di-reset`);
     } else {
       const textCol = isLightHex(preset.fill) ? '#111827' : '#fff';
-      const newStyleLine = `    style ${nodeId} fill:${preset.fill},stroke:#fff,stroke-width:2px,color:${textCol}`;
+      const newStyleLine = `style ${nodeId} fill:${preset.fill},stroke:#fff,stroke-width:2px,color:${textCol}`;
       let found = false;
       const updated = lines.map(l => {
         if (styleRegex.test(l)) {
@@ -1869,12 +1948,12 @@
     lines = lines.filter(l => !clsLineRe.test(l));
     while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
 
-    // 3) Pastikan classDef warna ada (sekali saja per warna)
+    // 3) Pastikan classDef warna ada (sekali saja per warna) — rata kiri (zero tab)
     if (!lines.some(l => new RegExp(`^\\s*classDef\\s+${clsName}\\b`).test(l))) {
       // tanpa stroke-width agar ketebalan tetap dikendalikan tipe panah (-->, -.->, ==>)
-      lines.push(`    classDef ${clsName} stroke:${preset.color},color:${preset.color}`);
+      lines.push(`classDef ${clsName} stroke:${preset.color},color:${preset.color}`);
     }
-    lines.push(`    class ${edgeId} ${clsName}`);
+    lines.push(`class ${edgeId} ${clsName}`);
     lines = pruneUnusedLineClassDefs(lines);
     commitCodeChange(lines, `Garis ${label} → ${preset.label || preset.color}`);
   }
@@ -1957,11 +2036,11 @@
     const rawLines = editor.value.split('\n');
     if (!lnMirror) {
       lnMirror = document.createElement('div');
-      lnMirror.style.cssText = 'position:absolute;top:-9999px;left:-9999px;visibility:hidden;pointer-events:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;font-family:"JetBrains Mono","Fira Code","SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:20px;tab-size:2;padding:0;margin:0;border:0;box-sizing:content-box;';
+      lnMirror.style.cssText = 'position:absolute;top:-9999px;left:-9999px;visibility:hidden;pointer-events:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;font-family:"JetBrains Mono","Fira Code","SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:20px;tab-size:2;padding:0 14px 0 calc(14px + 4ch);text-indent:-4ch each-line;margin:0;border:0;box-sizing:border-box;';
       document.body.appendChild(lnMirror);
     }
-    const contentW = Math.max(40, (editor.clientWidth || 300) - 28);
-    lnMirror.style.width = `${contentW}px`;
+    const editorW = Math.max(80, editor.clientWidth || 300);
+    lnMirror.style.width = `${editorW}px`;
     lnMirror.innerHTML = '';
     const frag = document.createDocumentFragment();
     rawLines.forEach(l => {
@@ -2028,10 +2107,17 @@
   editor.addEventListener('keydown', (e) => {
     if (e.key === 'Tab') {
       e.preventDefault();
+      document.execCommand('insertText', false, '  ');
+    } else if (e.key === 'Enter' && !e.isComposing) {
+      // Baris baru selalu rata kiri (zero tab, tanpa auto-indent spasi/tab)
+      e.preventDefault();
       const start = editor.selectionStart;
       const end = editor.selectionEnd;
-      editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
-      editor.selectionStart = editor.selectionEnd = start + 4;
+      const val = editor.value;
+      const before = val.slice(0, start);
+      const after = val.slice(end).replace(/^[ \t]+/, '');
+      editor.value = before + '\n' + after;
+      editor.selectionStart = editor.selectionEnd = before.length + 1;
       onEditorInput();
     }
   });

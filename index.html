@@ -215,6 +215,10 @@
     text-align: right;
     user-select: none;
     overflow: hidden;
+    flex-shrink: 0;
+  }
+  .line-numbers > div {
+    min-height: 20px;
   }
   .code-textarea {
     flex: 1;
@@ -230,8 +234,11 @@
     font-size: 13px;
     line-height: 20px;
     tab-size: 2;
-    white-space: pre;
-    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   /* Error Box */
@@ -1943,10 +1950,31 @@
     }
   }
 
+  let lnMirror = null;
   function updateLineNumbers() {
-    const lines = editor.value.split('\n').length;
+    const rawLines = editor.value.split('\n');
+    if (!lnMirror) {
+      lnMirror = document.createElement('div');
+      lnMirror.style.cssText = 'position:absolute;top:-9999px;left:-9999px;visibility:hidden;pointer-events:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;font-family:"JetBrains Mono","Fira Code","SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:20px;tab-size:2;padding:0;margin:0;border:0;box-sizing:content-box;';
+      document.body.appendChild(lnMirror);
+    }
+    const contentW = Math.max(40, (editor.clientWidth || 300) - 28);
+    lnMirror.style.width = `${contentW}px`;
+    lnMirror.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    rawLines.forEach(l => {
+      const row = document.createElement('div');
+      row.textContent = l || ' ';
+      frag.appendChild(row);
+    });
+    lnMirror.appendChild(frag);
+
+    const children = lnMirror.children;
     let html = '';
-    for (let i = 1; i <= lines; i++) html += i + '<br>';
+    for (let i = 0; i < rawLines.length; i++) {
+      const h = children[i] ? Math.max(20, children[i].offsetHeight) : 20;
+      html += `<div style="height:${h}px">${i + 1}</div>`;
+    }
     lineNumbers.innerHTML = html;
   }
 
@@ -2844,6 +2872,7 @@
     const sidebarW = document.getElementById('color-sidebar')?.offsetWidth || 0;
     const newWidth = Math.max(240, Math.min(window.innerWidth * 0.75, e.clientX - sidebarW));
     leftPane.style.width = `${newWidth}px`;
+    updateLineNumbers();
     pz?.resize();
     updateAoiOverlayPosition();
   });
@@ -2855,6 +2884,7 @@
   });
 
   window.addEventListener('resize', () => {
+    updateLineNumbers();
     pz?.resize();
     updateAoiOverlayPosition();
   });

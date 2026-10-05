@@ -525,54 +525,282 @@
     border-radius: 4px;
   }
   .color-preset-list {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    flex: none;
   }
-  .color-box-btn {
-    width: 100%;
-    padding: 5px 4px;
-    border: 2px solid #ffffff;
-    border-radius: 5px;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
+  .node-swatch {
+    height: 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    border-radius: 4px;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.35);
-    transition: transform 0.1s, filter 0.15s;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+    transition: transform 0.1s, filter 0.15s, border-color 0.15s;
+  }
+  .node-swatch:hover {
+    transform: scale(1.08);
+    filter: brightness(1.15);
+    border-color: #ffffff;
+  }
+  .node-swatch:active {
+    transform: scale(0.95);
+  }
+  .swatch-action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 1px;
+  }
+  .swatch-action-btn {
+    height: 22px;
+    background: #141418;
+    border: 1px dashed #6b6b7e;
+    border-radius: 4px;
+    color: #c7c7d6;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-left: 7px;
-    padding-right: 7px;
-  }
-  .color-box-btn:hover {
-    transform: scale(1.04);
-    filter: brightness(1.15);
-  }
-  .color-box-btn:active {
-    transform: scale(0.97);
-  }
-  .color-box-btn .mnem {
-    font-family: "JetBrains Mono", Menlo, monospace;
-    font-size: 10px;
-    background: rgba(0,0,0,0.32);
-    padding: 1px 4px;
-    border-radius: 3px;
-  }
-  .color-box-btn.reset-btn {
-    background: #141418;
-    border: 1.5px dashed #8b8b9e;
-    color: #c7c7d6;
     justify-content: center;
-    margin-top: 2px;
+    gap: 3px;
+    padding: 0 2px;
+    position: relative;
+    overflow: hidden;
   }
-  .color-box-btn.reset-btn:hover {
+  .swatch-action-btn:hover {
     border-color: #fff;
     color: #fff;
   }
+  .swatch-action-btn input[type="color"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+  }
+
+  /* Warna & Gaya Garis (edge) — berbasis Edge ID, bukan nomor linkStyle */
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0 2px;
+  }
+  .line-swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .line-swatch {
+    height: 18px;
+    border: 1.5px solid #2a2a34;
+    border-radius: 4px;
+    background: #1e1e26;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.1s, border-color 0.15s;
+  }
+  .line-swatch::before {
+    content: '';
+    display: block;
+    width: 72%;
+    height: 3.5px;
+    border-radius: 2px;
+    background: var(--sw);
+  }
+  .line-swatch:hover { transform: scale(1.08); border-color: #fff; }
+  .line-swatch:active { transform: scale(0.95); }
+  .line-type-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+  .line-type-btn {
+    height: 22px;
+    background: #1e1e26;
+    border: 1px solid #343442;
+    border-radius: 4px;
+    color: #c7c7d6;
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+  }
+  .line-type-btn::before {
+    content: '';
+    display: block;
+    width: 64%;
+    margin: 0 auto;
+    border-top: 2px solid #c7c7d6;
+  }
+  .line-type-btn[data-arrow="-.->"]::before { border-top-style: dotted; border-top-width: 3px; }
+  .line-type-btn[data-arrow="==>"]::before { border-top-width: 5px; }
+  .line-type-btn:hover { border-color: #fff; color: #fff; }
+  .line-type-btn:hover::before { border-top-color: #fff; }
+
+  /* Area of Interest (AOI) Export Overlay & Toolbar */
+  #aoi-toolbar {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    align-items: center;
+    gap: 5px;
+    background: rgba(22, 22, 28, 0.96);
+    backdrop-filter: blur(10px);
+    border: 1px solid #3d3d4e;
+    border-radius: 8px;
+    padding: 4px 8px;
+    z-index: 25;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+    user-select: none;
+    white-space: nowrap;
+  }
+  #aoi-toolbar.visible {
+    display: flex;
+  }
+  .aoi-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ff6996;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 5px;
+    border-right: 1px solid var(--border);
+  }
+  .aoi-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #141418;
+    border: 1px solid #2e2e3a;
+    border-radius: 5px;
+    padding: 2px 5px;
+  }
+  .aoi-field label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-family: "JetBrains Mono", Menlo, monospace;
+  }
+  .aoi-field input[type="number"] {
+    width: 46px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 11px;
+    text-align: right;
+  }
+  .aoi-field select {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 11px;
+    padding: 1px 2px;
+    cursor: pointer;
+  }
+  .aoi-btn {
+    background: #282834;
+    color: var(--text-main);
+    border: 1px solid #3a3a4a;
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .aoi-btn:hover {
+    background: #343444;
+    border-color: #525268;
+  }
+  .aoi-btn.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: #ff6996;
+  }
+  .aoi-btn.export-go {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .aoi-btn.export-go:hover {
+    background: var(--accent-hover);
+  }
+
+  #aoi-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+    overflow: hidden;
+    display: none;
+  }
+  #aoi-overlay.visible {
+    display: block;
+  }
+  #aoi-overlay.drawing-mode {
+    pointer-events: auto;
+    cursor: crosshair;
+  }
+  #aoi-rect {
+    position: absolute;
+    border: 2px dashed #ff3670;
+    box-shadow: 0 0 0 9999px rgba(10, 10, 15, 0.58), inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+    pointer-events: auto;
+    cursor: move;
+    border-radius: 2px;
+  }
+  #aoi-badge {
+    position: absolute;
+    left: -2px;
+    top: calc(100% + 6px);
+    background: rgba(255, 54, 112, 0.95);
+    color: #fff;
+    font-family: "JetBrains Mono", Menlo, monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .aoi-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border: 2px solid #ff3670;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .aoi-handle.nw { top: -6px; left: -6px; cursor: nwse-resize; }
+  .aoi-handle.n  { top: -6px; left: calc(50% - 5px); cursor: ns-resize; }
+  .aoi-handle.ne { top: -6px; right: -6px; cursor: nesw-resize; }
+  .aoi-handle.e  { top: calc(50% - 5px); right: -6px; cursor: ew-resize; }
+  .aoi-handle.se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+  .aoi-handle.s  { bottom: -6px; left: calc(50% - 5px); cursor: ns-resize; }
+  .aoi-handle.sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+  .aoi-handle.w  { top: calc(50% - 5px); left: -6px; cursor: ew-resize; }
 </style>
 </head>
 <body>
@@ -625,10 +853,13 @@
     <button class="btn" id="btn-copy-code" title="Salin kode Mermaid">
       <i class="fa-regular fa-copy"></i> Copy Code
     </button>
-    <button class="btn" id="btn-download-svg" title="Unduh file SVG">
+    <button class="btn" id="btn-toggle-aoi" title="Buka/Atur Kotak Area of Interest (AOI) untuk Export">
+      <i class="fa-solid fa-crop-simple"></i> Area Export
+    </button>
+    <button class="btn" id="btn-download-svg" title="Unduh file SVG (sesuai Area of Interest)">
       <i class="fa-solid fa-download"></i> SVG
     </button>
-    <button class="btn" id="btn-download-png" title="Unduh gambar PNG">
+    <button class="btn" id="btn-download-png" title="Unduh gambar PNG Ultra-HD (sesuai Area of Interest)">
       <i class="fa-regular fa-image"></i> PNG
     </button>
 
@@ -646,7 +877,7 @@
 
 <!-- Main Split Workspace -->
 <main id="workspace">
-  <!-- Kolom Kecil Preset Warna Node -->
+  <!-- Kolom Kecil Preset Warna Node & Garis -->
   <aside id="color-sidebar">
     <div class="color-sidebar-title">Warna Node</div>
     <div class="target-node-box" title="Node yang akan diwarnai (otomatis mengikuti baris kursor atau klik kotak di diagram)">
@@ -654,6 +885,33 @@
       <select id="target-node-select"></select>
     </div>
     <div class="color-preset-list" id="color-preset-list"></div>
+    <div class="swatch-action-row">
+      <label class="swatch-action-btn" title="Pilih warna bebas (Custom) untuk node aktif">
+        <i class="fa-solid fa-palette"></i> Pilih
+        <input type="color" id="node-custom-color" value="#2563eb">
+      </label>
+      <button class="swatch-action-btn" id="btn-node-reset" title="Hapus warna kustom pada node aktif">✕ Reset</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="color-sidebar-title">Warna Garis</div>
+    <div class="target-node-box" title="Garis/panah yang akan diwarnai (otomatis mengikuti kursor di baris panah, atau klik garis di diagram)">
+      <label for="target-edge-select">Target Garis:</label>
+      <select id="target-edge-select"></select>
+    </div>
+    <div class="line-swatch-grid" id="line-swatch-grid"></div>
+    <div class="line-type-row">
+      <button class="line-type-btn" data-arrow="-->" title="Garis solid (-->)"></button>
+      <button class="line-type-btn" data-arrow="-.->" title="Garis putus-putus (-.->)"></button>
+      <button class="line-type-btn" data-arrow="==>" title="Garis tebal (==>)"></button>
+    </div>
+    <div class="swatch-action-row">
+      <label class="swatch-action-btn" title="Pilih warna bebas (Custom) untuk garis aktif">
+        <i class="fa-solid fa-palette"></i> Pilih
+        <input type="color" id="edge-custom-color" value="#22c55e">
+      </label>
+      <button class="swatch-action-btn" id="btn-edge-reset" title="Hapus warna kustom pada garis aktif">✕ Reset</button>
+    </div>
   </aside>
 
   <!-- Left Panel: Editor -->
@@ -702,12 +960,86 @@
   <section id="right-pane" class="grid-on">
     <div id="container"></div>
 
+    <!-- Toolbar Input Kotak Area of Interest (AOI) -->
+    <div id="aoi-toolbar">
+      <span class="aoi-title"><i class="fa-solid fa-crop-simple"></i> AOI</span>
+      <div class="aoi-field" title="Koordinat X kiri atas (satuan SVG)">
+        <label for="aoi-x">X</label>
+        <input type="number" id="aoi-x" step="1" value="0" style="width:40px;">
+      </div>
+      <div class="aoi-field" title="Koordinat Y kiri atas (satuan SVG)">
+        <label for="aoi-y">Y</label>
+        <input type="number" id="aoi-y" step="1" value="0" style="width:40px;">
+      </div>
+      <div class="aoi-field" title="Lebar kotak Area of Interest (satuan SVG)">
+        <label for="aoi-w">W</label>
+        <input type="number" id="aoi-w" min="10" step="1" value="400" style="width:42px;">
+      </div>
+      <div class="aoi-field" title="Tinggi kotak Area of Interest (satuan SVG)">
+        <label for="aoi-h">H</label>
+        <input type="number" id="aoi-h" min="10" step="1" value="400" style="width:42px;">
+      </div>
+      <div class="aoi-field" title="Margin / Padding otomatis saat klik Fit">
+        <label for="aoi-pad">Pad</label>
+        <input type="number" id="aoi-pad" min="0" max="500" step="4" value="24" style="width:34px;">
+      </div>
+      <div class="aoi-field" title="Skala resolusi PNG (semakin tinggi semakin tajam)">
+        <label for="aoi-scale">Res</label>
+        <select id="aoi-scale">
+          <option value="2">2×</option>
+          <option value="4" selected>4×</option>
+          <option value="6">6×</option>
+          <option value="8">8×</option>
+        </select>
+      </div>
+      <div class="aoi-field" title="Warna latar belakang hasil export">
+        <label for="aoi-bg">BG</label>
+        <select id="aoi-bg">
+          <option value="canvas" selected>Kanvas</option>
+          <option value="#1b1b1f">Dark</option>
+          <option value="#ffffff">Putih</option>
+          <option value="transparent">Transparan</option>
+        </select>
+      </div>
+      <button class="aoi-btn" id="btn-aoi-fit" title="Paskan kotak AOI tepat mengelilingi seluruh diagram">
+        <i class="fa-solid fa-compress"></i> Fit
+      </button>
+      <button class="aoi-btn" id="btn-aoi-draw" title="Klik & drag di kanvas untuk menggambar kotak AOI baru">
+        <i class="fa-solid fa-pen-ruler"></i> Tarik
+      </button>
+      <button class="aoi-btn export-go" id="btn-aoi-png" title="Unduh PNG dari Area of Interest ini">
+        <i class="fa-regular fa-image"></i> PNG
+      </button>
+      <button class="aoi-btn" id="btn-aoi-svg" title="Unduh SVG dari Area of Interest ini">
+        <i class="fa-solid fa-download"></i> SVG
+      </button>
+      <button class="aoi-btn" id="btn-aoi-close" title="Sembunyikan bingkai AOI (Esc)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Bingkai Interaktif Area of Interest (AOI) di Atas Kanvas -->
+    <div id="aoi-overlay">
+      <div id="aoi-rect">
+        <div id="aoi-badge">AOI: 0 × 0</div>
+        <div class="aoi-handle nw" data-dir="nw"></div>
+        <div class="aoi-handle n" data-dir="n"></div>
+        <div class="aoi-handle ne" data-dir="ne"></div>
+        <div class="aoi-handle e" data-dir="e"></div>
+        <div class="aoi-handle se" data-dir="se"></div>
+        <div class="aoi-handle s" data-dir="s"></div>
+        <div class="aoi-handle sw" data-dir="sw"></div>
+        <div class="aoi-handle w" data-dir="w"></div>
+      </div>
+    </div>
+
     <div id="canvas-controls">
       <button class="icon-btn" id="zout" title="Zoom out"><i class="fa-solid fa-minus"></i></button>
       <span class="zoom-readout" id="zoom-label">88%</span>
       <button class="icon-btn" id="zin" title="Zoom in"><i class="fa-solid fa-plus"></i></button>
       <button class="icon-btn" id="zreset" title="Reset view"><i class="fa-solid fa-expand"></i></button>
       <div class="divider-v"></div>
+      <button class="icon-btn" id="btn-aoi-canvas" title="Tampilkan / Sembunyikan Kotak Area of Interest (AOI) Export"><i class="fa-solid fa-crop-simple"></i></button>
       <button class="icon-btn active" id="btn-grid" title="Toggle grid"><i class="fa-solid fa-border-all"></i></button>
       <button class="icon-btn" id="btn-bg" title="Toggle warna background canvas"><i class="fa-solid fa-circle-half-stroke"></i></button>
     </div>
@@ -781,18 +1113,36 @@
   const colorPresetList = document.getElementById('color-preset-list');
 
   const COLOR_PRESETS = [
-    { code: 'M',  name: 'Merah',   fill: '#b91c1c' },
-    { code: 'O',  name: 'Oranye',  fill: '#c2410c' },
-    { code: 'K',  name: 'Kuning',  fill: '#a16207' },
-    { code: 'H',  name: 'Hijau',   fill: '#15803d' },
-    { code: 'T',  name: 'Tosca',   fill: '#0f766e' },
-    { code: 'C',  name: 'Cyan',    fill: '#0369a1' },
-    { code: 'B',  name: 'Biru',    fill: '#1d4ed8' },
-    { code: 'I',  name: 'Indigo',  fill: '#4338ca' },
-    { code: 'U',  name: 'Ungu',    fill: '#6d28d9' },
-    { code: 'P',  name: 'Pink',    fill: '#be185d' },
-    { code: 'CK', name: 'Cokelat', fill: '#78350f' },
-    { code: 'A',  name: 'Abu',     fill: '#374151' }
+    // Baris 1: Merah → Pink
+    { code: 'MT', name: 'Merah Tua',  fill: '#7f1d1d' },
+    { code: 'M',  name: 'Merah',      fill: '#b91c1c' },
+    { code: 'MR', name: 'Crimson',    fill: '#e11d48' },
+    { code: 'P',  name: 'Pink',       fill: '#be185d' },
+    // Baris 2: Cokelat → Kuning
+    { code: 'CK', name: 'Cokelat',    fill: '#78350f' },
+    { code: 'O',  name: 'Oranye',     fill: '#c2410c' },
+    { code: 'AM', name: 'Amber',      fill: '#b45309' },
+    { code: 'K',  name: 'Kuning',     fill: '#a16207' },
+    // Baris 3: Lime → Tosca
+    { code: 'LM', name: 'Lime',       fill: '#3f6212' },
+    { code: 'H',  name: 'Hijau',      fill: '#15803d' },
+    { code: 'EM', name: 'Emerald',    fill: '#047857' },
+    { code: 'T',  name: 'Tosca',      fill: '#0f766e' },
+    // Baris 4: Cyan → Navy
+    { code: 'C',  name: 'Cyan',       fill: '#0e7490' },
+    { code: 'SK', name: 'Sky',        fill: '#0369a1' },
+    { code: 'B',  name: 'Biru',       fill: '#1d4ed8' },
+    { code: 'NV', name: 'Navy',       fill: '#1e3a8a' },
+    // Baris 5: Indigo → Magenta
+    { code: 'I',  name: 'Indigo',     fill: '#4338ca' },
+    { code: 'U',  name: 'Ungu',       fill: '#6d28d9' },
+    { code: 'PR', name: 'Purple',     fill: '#7e22ce' },
+    { code: 'MG', name: 'Magenta',    fill: '#a21caf' },
+    // Baris 6: Earth & Neutral
+    { code: 'BZ', name: 'Bronze',     fill: '#57534e' },
+    { code: 'SL', name: 'Slate',      fill: '#475569' },
+    { code: 'A',  name: 'Abu',        fill: '#374151' },
+    { code: 'HT', name: 'Hitam',      fill: '#18181b' }
   ];
 
   const RESERVED_WORDS = new Set([
@@ -802,6 +1152,8 @@
   ]);
 
   let pz = null;
+  let lastCleanSvg = null;
+  let lastDiagramBox = null;
   let renderCounter = 0;
   let isFirstRender = true;
   let currentTargetNode = 'A';
@@ -814,38 +1166,94 @@
     showToast._timer = setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  // Extract node tokens [{id, index}] from a single line of Mermaid flowchart
-  function extractNodesFromLine(rawLine) {
+  // Token panah flowchart: opsional "edgeId@" + panah (-->, ---, -.->, -.-, ==>, ===, --o, --x, <-->, ~~~)
+  // juga opener/closer untuk panah ber-teks inline: "-- teks -->", "-. teks .->", "== teks ==>"
+  const ARROW_TOKEN_RE = /(?:([A-Za-z_][\w-]*)@)?(<?(?:-\.+-[>xo]?|-{2,}[>xo]?|={2,}[>xo]?|~{3,}|\.-[>xo]?|-\.(?=\s)))/g;
+
+  // Tokenize satu baris flowchart → { nodes: [{id, index}], edges: [{start, arrowStart, end, id, arrow, close, inlineText, src, dst}] }
+  function tokenizeFlowLine(rawLine) {
+    const empty = { nodes: [], edges: [] };
     const noComment = rawLine.replace(/%%.*$/, '');
-    const trimmed = noComment.trim();
-    if (!trimmed) return [];
+    if (!noComment.trim()) return empty;
 
     // Check if it's a style line: style <NodeID> ...
     const styleMatch = noComment.match(/^\s*style\s+([A-Za-z0-9_-]+)\b/);
     if (styleMatch) {
-      return [{ id: styleMatch[1], index: noComment.indexOf(styleMatch[1]) }];
+      return { nodes: [{ id: styleMatch[1], index: noComment.indexOf(styleMatch[1]) }], edges: [] };
     }
     if (/^\s*(flowchart|graph|subgraph|end|direction|classDef|class|click|linkStyle)\b/.test(noComment)) {
-      return [];
+      return empty;
     }
 
     // Mask out edge labels |...|, node shapes [...], (...), {...}, and :::class
-    const masked = noComment
+    let masked = noComment
       .replace(/\|[^|]*\|/g, m => ' '.repeat(m.length))
       .replace(/\[[^\]]*\]/g, m => ' '.repeat(m.length))
       .replace(/\([^)]*\)/g, m => ' '.repeat(m.length))
       .replace(/\{[^}]*\}/g, m => ' '.repeat(m.length))
       .replace(/:::[A-Za-z0-9_-]+/g, m => ' '.repeat(m.length));
 
-    const results = [];
+    // Cari token panah
+    const rawTokens = [];
+    ARROW_TOKEN_RE.lastIndex = 0;
+    let t;
+    while ((t = ARROW_TOKEN_RE.exec(masked)) !== null) {
+      rawTokens.push({
+        start: t.index,
+        arrowStart: t.index + (t[1] ? t[1].length + 1 : 0),
+        end: t.index + t[0].length,
+        id: t[1] || null,
+        arrow: t[2]
+      });
+    }
+
+    // Gabungkan opener + closer menjadi satu edge ber-teks inline
+    const edges = [];
+    for (let i = 0; i < rawTokens.length; i++) {
+      const tok = rawTokens[i];
+      const bare = tok.arrow.replace(/^</, '');
+      const next = rawTokens[i + 1];
+      if (['--', '==', '-.'].includes(bare) && next && !next.id) {
+        edges.push({
+          start: tok.start, arrowStart: tok.arrowStart, end: next.end, id: tok.id,
+          arrow: tok.arrow, close: next.arrow,
+          inlineText: noComment.slice(tok.end, next.start).trim()
+        });
+        i++;
+      } else {
+        edges.push({ ...tok, close: tok.arrow, inlineText: null });
+      }
+    }
+
+    // Kosongkan area panah (+ teks inline) dan sisa "id@" agar tidak terbaca sebagai node
+    edges.forEach(e => {
+      masked = masked.slice(0, e.start) + ' '.repeat(e.end - e.start) + masked.slice(e.end);
+    });
+    masked = masked.replace(/[A-Za-z_][\w-]*@/g, s => ' '.repeat(s.length));
+
+    const nodes = [];
     const regex = /\b([A-Za-z_][A-Za-z0-9_-]*)\b/g;
     let m;
     while ((m = regex.exec(masked)) !== null) {
       if (!RESERVED_WORDS.has(m[1])) {
-        results.push({ id: m[1], index: m.index });
+        nodes.push({ id: m[1], index: m.index });
       }
     }
-    return results;
+
+    // Tentukan node asal (src) & tujuan (dst) tiap edge
+    edges.forEach(e => {
+      const before = nodes.filter(n => n.index < e.start);
+      const after = nodes.find(n => n.index >= e.end);
+      e.src = before.length ? before[before.length - 1].id : null;
+      e.dst = after ? after.id : null;
+    });
+
+    return { nodes, edges };
+  }
+
+  // Extract node tokens [{id, index}] from a single line of Mermaid flowchart
+  function extractNodesFromLine(rawLine) {
+    return tokenizeFlowLine(rawLine).nodes;
   }
 
   function refreshNodeDropdown(preferredNode = null) {
@@ -882,6 +1290,14 @@
     currentTargetNode = targetNodeSelect.value;
   });
 
+  function isLightHex(hex) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+    if (!m) return false;
+    const n = parseInt(m[1], 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62;
+  }
+
   function applyColorToTargetNode(preset) {
     refreshNodeDropdown();
     const nodeId = targetNodeSelect.value;
@@ -899,7 +1315,8 @@
       mermaidCode = filtered.join('\n');
       showToast(`Warna node "${nodeId}" di-reset`);
     } else {
-      const newStyleLine = `    style ${nodeId} fill:${preset.fill},stroke:#fff,stroke-width:2px,color:#fff`;
+      const textCol = isLightHex(preset.fill) ? '#111827' : '#fff';
+      const newStyleLine = `    style ${nodeId} fill:${preset.fill},stroke:#fff,stroke-width:2px,color:${textCol}`;
       let found = false;
       const updated = lines.map(l => {
         if (styleRegex.test(l)) {
@@ -916,7 +1333,7 @@
         updated.push(newStyleLine);
       }
       mermaidCode = updated.join('\n') + '\n';
-      showToast(`Node "${nodeId}" → ${preset.name} (${preset.code})`);
+      showToast(`Node "${nodeId}" → ${preset.name}${preset.code ? ` (${preset.code})` : ''}`);
     }
 
     if (activeTab === 'code') {
@@ -926,27 +1343,257 @@
     renderDiagram(true);
   }
 
-  // Build Color Preset Buttons in Left Column
+  // Build Compact Color Swatch Buttons in Left Column (tanpa teks, hanya kotak warna)
   function initColorPresetButtons() {
     colorPresetList.innerHTML = '';
     COLOR_PRESETS.forEach(p => {
       const btn = document.createElement('button');
-      btn.className = 'color-box-btn';
+      btn.className = 'node-swatch';
       btn.style.background = p.fill;
-      btn.title = `Warnai node aktif menjadi ${p.name} (stroke putih). Bisa juga ketik :::${p.code}`;
-      btn.innerHTML = `<span>${p.name}</span><span class="mnem">${p.code}</span>`;
+      btn.title = `${p.name} (${p.fill}) — bisa juga ketik :::${p.code}`;
       btn.onclick = () => applyColorToTargetNode(p);
       colorPresetList.appendChild(btn);
     });
 
-    const resetBtn = document.createElement('button');
-    resetBtn.className = 'color-box-btn reset-btn';
-    resetBtn.title = 'Hapus warna kustom pada node aktif';
-    resetBtn.textContent = '✕ Reset';
-    resetBtn.onclick = () => applyColorToTargetNode(null);
-    colorPresetList.appendChild(resetBtn);
+    const nodeCustomInput = document.getElementById('node-custom-color');
+    if (nodeCustomInput) {
+      nodeCustomInput.addEventListener('change', (e) => {
+        const hex = e.target.value;
+        applyColorToTargetNode({ code: '', name: hex, fill: hex });
+      });
+    }
+    const nodeResetBtn = document.getElementById('btn-node-reset');
+    if (nodeResetBtn) {
+      nodeResetBtn.onclick = () => applyColorToTargetNode(null);
+    }
   }
   initColorPresetButtons();
+
+  // ===== Warna & Gaya Garis — berbasis Edge ID (A e_A_B@--> B), BUKAN nomor linkStyle =====
+  // 24 warna garis (lebih terang agar kontras di kanvas gelap)
+  const LINE_PRESETS = [
+    // Baris 1: Merah → Pink
+    { name: 'MerahTua',  label: 'Merah Tua',  color: '#dc2626' },
+    { name: 'Merah',     label: 'Merah',      color: '#ef4444' },
+    { name: 'Rose',      label: 'Rose',       color: '#fb7185' },
+    { name: 'Pink',      label: 'Pink',       color: '#ec4899' },
+    // Baris 2: Cokelat → Kuning
+    { name: 'Cokelat',   label: 'Cokelat',    color: '#b45309' },
+    { name: 'Oranye',    label: 'Oranye',     color: '#f97316' },
+    { name: 'Amber',     label: 'Amber',      color: '#f59e0b' },
+    { name: 'Kuning',    label: 'Kuning',     color: '#eab308' },
+    // Baris 3: Lime → Tosca
+    { name: 'Lime',      label: 'Lime',       color: '#84cc16' },
+    { name: 'Hijau',     label: 'Hijau',      color: '#22c55e' },
+    { name: 'Emerald',   label: 'Emerald',    color: '#10b981' },
+    { name: 'Tosca',     label: 'Tosca',      color: '#14b8a6' },
+    // Baris 4: Cyan → Biru Muda
+    { name: 'Cyan',      label: 'Cyan',       color: '#06b6d4' },
+    { name: 'Sky',       label: 'Sky',        color: '#38bdf8' },
+    { name: 'Biru',      label: 'Biru',       color: '#3b82f6' },
+    { name: 'BiruMuda',  label: 'Biru Muda',  color: '#60a5fa' },
+    // Baris 5: Indigo → Magenta
+    { name: 'Indigo',    label: 'Indigo',     color: '#818cf8' },
+    { name: 'Ungu',      label: 'Ungu',       color: '#a855f7' },
+    { name: 'Purple',    label: 'Purple',     color: '#c084fc' },
+    { name: 'Magenta',   label: 'Magenta',    color: '#e879f9' },
+    // Baris 6: Gold, Slate, Abu, Putih
+    { name: 'Gold',      label: 'Gold',       color: '#fbbf24' },
+    { name: 'Slate',     label: 'Slate',      color: '#94a3b8' },
+    { name: 'Abu',       label: 'Abu',        color: '#6b7280' },
+    { name: 'Putih',     label: 'Putih',      color: '#ffffff' }
+  ];
+  const targetEdgeSelect = document.getElementById('target-edge-select');
+  const lineSwatchGrid = document.getElementById('line-swatch-grid');
+  let currentTargetEdgeKey = null; // "<lineIdx>:<urutan edge di baris itu>"
+
+  const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const isFlowchartCode = () => /^\s*(flowchart|graph)\b/m.test(mermaidCode);
+
+  function collectEdges() {
+    const list = [];
+    if (!isFlowchartCode()) return list;
+    mermaidCode.split('\n').forEach((line, li) => {
+      tokenizeFlowLine(line).edges.forEach((e, ord) => {
+        list.push({ ...e, lineIdx: li, ord, key: `${li}:${ord}` });
+      });
+    });
+    return list;
+  }
+
+  function refreshEdgeDropdown(preferredKey = null) {
+    const edges = collectEdges();
+    const want = preferredKey || currentTargetEdgeKey;
+    const pairCount = {};
+    targetEdgeSelect.innerHTML = '';
+    edges.forEach(e => {
+      const pair = `${e.src || '?'}→${e.dst || '?'}`;
+      pairCount[pair] = (pairCount[pair] || 0) + 1;
+      const opt = document.createElement('option');
+      opt.value = e.key;
+      opt.textContent = pairCount[pair] > 1 ? `${pair} #${pairCount[pair]}` : pair;
+      targetEdgeSelect.appendChild(opt);
+    });
+    if (want && edges.some(e => e.key === want)) {
+      currentTargetEdgeKey = want;
+    } else {
+      currentTargetEdgeKey = edges.length ? edges[0].key : null;
+    }
+    if (currentTargetEdgeKey) targetEdgeSelect.value = currentTargetEdgeKey;
+  }
+
+  targetEdgeSelect.addEventListener('change', () => {
+    currentTargetEdgeKey = targetEdgeSelect.value;
+  });
+
+  function getTargetEdge() {
+    refreshEdgeDropdown();
+    const edges = collectEdges();
+    const edge = edges.find(e => e.key === currentTargetEdgeKey);
+    if (!edge) showToast('Tidak ada garis/panah flowchart yang terdeteksi');
+    return { edge, edges };
+  }
+
+  // Buat ID edge yang mudah dibaca & unik, mis. e_A_B, e_A_B_2
+  function makeUniqueEdgeId(edge, edges) {
+    const taken = new Set(edges.map(e => e.id).filter(Boolean));
+    mermaidCode.split('\n').forEach(l => extractNodesFromLine(l).forEach(n => taken.add(n.id)));
+    const base = `e_${edge.src || 'x'}_${edge.dst || 'x'}`;
+    let id = base, n = 2;
+    while (taken.has(id)) id = `${base}_${n++}`;
+    return id;
+  }
+
+  // Simpan perubahan kode, pertahankan posisi kursor & scroll editor
+  function commitCodeChange(lines, toastMsg) {
+    while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
+    mermaidCode = lines.join('\n') + '\n';
+    if (activeTab === 'code') {
+      const pos = editor.selectionStart, scroll = editor.scrollTop;
+      editor.value = mermaidCode;
+      editor.selectionStart = editor.selectionEnd = Math.min(pos, mermaidCode.length);
+      editor.scrollTop = scroll;
+      updateLineNumbers();
+    }
+    if (toastMsg) showToast(toastMsg);
+    renderDiagram(true);
+  }
+
+  // Hapus classDef ln<Warna> yang sudah tidak dipakai edge mana pun
+  function pruneUnusedLineClassDefs(lines) {
+    const used = new Set();
+    lines.forEach(l => {
+      const m = l.match(/^\s*class\s+\S+\s+(ln[A-Za-z0-9_]+)\s*;?\s*$/);
+      if (m) used.add(m[1]);
+    });
+    return lines.filter(l => {
+      const m = l.match(/^\s*classDef\s+(ln[A-Za-z0-9_]+)\b/);
+      return !m || used.has(m[1]);
+    });
+  }
+
+  function applyEdgeColor(preset) {
+    const { edge, edges } = getTargetEdge();
+    if (!edge) return;
+    let lines = mermaidCode.split('\n');
+    let edgeId = edge.id;
+    const label = `${edge.src || '?'}→${edge.dst || '?'}`;
+
+    if (!preset) {
+      if (!edgeId) { showToast(`Garis ${label} belum punya warna kustom`); return; }
+      const clsLineRe = new RegExp(`^\\s*class\\s+${escRe(edgeId)}\\s+ln[A-Za-z0-9_]+\\s*;?\\s*$`);
+      lines = pruneUnusedLineClassDefs(lines.filter(l => !clsLineRe.test(l)));
+      commitCodeChange(lines, `Warna garis ${label} di-reset`);
+      return;
+    }
+
+    // 1) Pasang Edge ID pada panah bila belum ada: "A --> B" → "A e_A_B@--> B"
+    if (!edgeId) {
+      edgeId = makeUniqueEdgeId(edge, edges);
+      const ln = lines[edge.lineIdx];
+      const needSpace = edge.start > 0 && !/\s/.test(ln[edge.start - 1]);
+      lines[edge.lineIdx] = ln.slice(0, edge.start) + (needSpace ? ' ' : '') + `${edgeId}@` + ln.slice(edge.start);
+    }
+
+    // 2) Ganti class warna lama → baru
+    const safeSuffix = (preset.name || '').replace(/[^A-Za-z0-9_]/g, '');
+    const clsName = `ln${safeSuffix}`;
+    const clsLineRe = new RegExp(`^\\s*class\\s+${escRe(edgeId)}\\s+ln[A-Za-z0-9_]+\\s*;?\\s*$`);
+    lines = lines.filter(l => !clsLineRe.test(l));
+    while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
+
+    // 3) Pastikan classDef warna ada (sekali saja per warna)
+    if (!lines.some(l => new RegExp(`^\\s*classDef\\s+${clsName}\\b`).test(l))) {
+      // tanpa stroke-width agar ketebalan tetap dikendalikan tipe panah (-->, -.->, ==>)
+      lines.push(`    classDef ${clsName} stroke:${preset.color},color:${preset.color}`);
+    }
+    lines.push(`    class ${edgeId} ${clsName}`);
+    lines = pruneUnusedLineClassDefs(lines);
+    commitCodeChange(lines, `Garis ${label} → ${preset.label || preset.color}`);
+  }
+
+  // Ganti tipe garis langsung di sintaks panah: solid (-->), putus-putus (-.->), tebal (==>)
+  function applyEdgeType(kind) {
+    const { edge } = getTargetEdge();
+    if (!edge) return;
+    const lines = mermaidCode.split('\n');
+    const lastChar = (edge.close || edge.arrow).slice(-1);
+    const head = '>xo'.includes(lastChar) ? lastChar : '';
+    const bidir = edge.arrow.startsWith('<');
+    const body = head
+      ? { solid: '--', dashed: '-.-', thick: '==' }[kind]
+      : { solid: '---', dashed: '-.-', thick: '===' }[kind];
+    const newArrow = (bidir ? '<' : '') + body + head;
+    const repl = newArrow + (edge.inlineText ? `|${edge.inlineText}|` : '');
+    const ln = lines[edge.lineIdx];
+    lines[edge.lineIdx] = ln.slice(0, edge.arrowStart) + repl + ln.slice(edge.end);
+    const names = { solid: 'solid', dashed: 'putus-putus', thick: 'tebal' };
+    commitCodeChange(lines, `Garis ${edge.src || '?'}→${edge.dst || '?'} → ${names[kind]}`);
+  }
+
+  function initLineControls() {
+    lineSwatchGrid.innerHTML = '';
+    LINE_PRESETS.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'line-swatch';
+      btn.style.setProperty('--sw', p.color);
+      btn.title = `${p.label || p.name} (${p.color})`;
+      btn.onclick = () => applyEdgeColor(p);
+      lineSwatchGrid.appendChild(btn);
+    });
+    const kindOf = { '-->': 'solid', '-.->': 'dashed', '==>': 'thick' };
+    document.querySelectorAll('.line-type-btn').forEach(b => {
+      b.onclick = () => applyEdgeType(kindOf[b.dataset.arrow]);
+    });
+    const edgeCustomInput = document.getElementById('edge-custom-color');
+    if (edgeCustomInput) {
+      edgeCustomInput.addEventListener('change', (e) => {
+        const hex = e.target.value;
+        applyEdgeColor({ name: '_' + hex.replace('#', ''), label: hex, color: hex });
+      });
+    }
+    document.getElementById('btn-edge-reset').onclick = () => applyEdgeColor(null);
+  }
+  initLineControls();
+
+  // Pilih edge dari klik garis di SVG. Path id Mermaid: "<renderId>-<edgeId>" atau "<renderId>-L_<src>_<dst>_<n>"
+  function selectEdgeFromPathId(pathId) {
+    const edges = collectEdges();
+    let found = edges.find(e => e.id && pathId.endsWith(`-${e.id}`));
+    if (!found) {
+      const seen = {};
+      found = edges.find(e => {
+        if (e.id) return false;
+        const pair = `L_${e.src}_${e.dst}_`;
+        const n = seen[pair] = (seen[pair] ?? -1) + 1;
+        return pathId.endsWith(`-${pair}${n}`);
+      });
+    }
+    if (found) {
+      refreshEdgeDropdown(found.key);
+      showToast(`Target Garis dipilih: ${found.src}→${found.dst}`);
+    }
+  }
 
   function updateLineNumbers() {
     const lines = editor.value.split('\n').length;
@@ -978,6 +1625,19 @@
         }
         refreshNodeDropdown(currentTargetNode);
       }
+
+      // Auto-pilih garis terdekat dari kursor bila baris berisi panah
+      if (isFlowchartCode()) {
+        const lineEdges = tokenizeFlowLine(currentLine).edges;
+        if (lineEdges.length) {
+          let best = 0, bestDist = Infinity;
+          lineEdges.forEach((e, ord) => {
+            const d = colIdx < e.start ? e.start - colIdx : (colIdx > e.end ? colIdx - e.end : 0);
+            if (d < bestDist) { bestDist = d; best = ord; }
+          });
+          refreshEdgeDropdown(`${lineIdx}:${best}`);
+        }
+      }
     }
   }
 
@@ -998,9 +1658,135 @@
     }
   });
 
+  const aoiToolbar = document.getElementById('aoi-toolbar');
+  const aoiOverlay = document.getElementById('aoi-overlay');
+  const aoiRectEl = document.getElementById('aoi-rect');
+  const aoiBadgeEl = document.getElementById('aoi-badge');
+  const aoiXInput = document.getElementById('aoi-x');
+  const aoiYInput = document.getElementById('aoi-y');
+  const aoiWInput = document.getElementById('aoi-w');
+  const aoiHInput = document.getElementById('aoi-h');
+  const aoiPadInput = document.getElementById('aoi-pad');
+  const aoiScaleSelect = document.getElementById('aoi-scale');
+  const aoiBgSelect = document.getElementById('aoi-bg');
+  const btnToggleAoi = document.getElementById('btn-toggle-aoi');
+  const btnAoiCanvas = document.getElementById('btn-aoi-canvas');
+  const btnAoiDraw = document.getElementById('btn-aoi-draw');
+
+  let aoiVisible = false;
+  let aoiCustom = false;
+  let aoiDrawingMode = false;
+  let aoiBox = { x: 0, y: 0, w: 400, h: 400 };
+
+  function getViewportInnerGroup() {
+    const svgEl = container.querySelector('svg');
+    if (!svgEl) return null;
+    return svgEl.querySelector('.svg-pan-zoom_viewport > g')
+      || svgEl.querySelector('.svg-pan-zoom_viewport')
+      || svgEl;
+  }
+
+  function svgPointToPane(svgX, svgY) {
+    const svgEl = container.querySelector('svg');
+    const vp = getViewportInnerGroup();
+    if (!svgEl || !vp || !vp.getScreenCTM) return { x: 0, y: 0 };
+    const ctm = vp.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
+    const pt = svgEl.createSVGPoint();
+    pt.x = svgX;
+    pt.y = svgY;
+    const screenPt = pt.matrixTransform(ctm);
+    const paneRect = rightPane.getBoundingClientRect();
+    return {
+      x: screenPt.x - paneRect.left,
+      y: screenPt.y - paneRect.top
+    };
+  }
+
+  function panePointToSvg(paneX, paneY) {
+    const svgEl = container.querySelector('svg');
+    const vp = getViewportInnerGroup();
+    if (!svgEl || !vp || !vp.getScreenCTM) return { x: 0, y: 0 };
+    const ctm = vp.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
+    const paneRect = rightPane.getBoundingClientRect();
+    const pt = svgEl.createSVGPoint();
+    pt.x = paneRect.left + paneX;
+    pt.y = paneRect.top + paneY;
+    const svgPt = pt.matrixTransform(ctm.inverse());
+    return { x: svgPt.x, y: svgPt.y };
+  }
+
+  function fitAoiToDiagram() {
+    if (!lastDiagramBox) return;
+    const pad = Math.max(0, Number(aoiPadInput.value) || 0);
+    aoiBox = {
+      x: Math.round(lastDiagramBox.x - pad),
+      y: Math.round(lastDiagramBox.y - pad),
+      w: Math.max(20, Math.round(lastDiagramBox.width + pad * 2)),
+      h: Math.max(20, Math.round(lastDiagramBox.height + pad * 2))
+    };
+    aoiCustom = false;
+    syncAoiInputsAndOverlay();
+  }
+
+  function syncAoiInputsAndOverlay() {
+    aoiXInput.value = Math.round(aoiBox.x);
+    aoiYInput.value = Math.round(aoiBox.y);
+    aoiWInput.value = Math.max(10, Math.round(aoiBox.w));
+    aoiHInput.value = Math.max(10, Math.round(aoiBox.h));
+    updateAoiOverlayPosition();
+  }
+
+  function updateAoiOverlayPosition() {
+    if (!aoiVisible) return;
+    const p1 = svgPointToPane(aoiBox.x, aoiBox.y);
+    const p2 = svgPointToPane(aoiBox.x + aoiBox.w, aoiBox.y + aoiBox.h);
+    const left = Math.min(p1.x, p2.x);
+    const top = Math.min(p1.y, p2.y);
+    const width = Math.max(8, Math.abs(p2.x - p1.x));
+    const height = Math.max(8, Math.abs(p2.y - p1.y));
+
+    aoiRectEl.style.left = `${left}px`;
+    aoiRectEl.style.top = `${top}px`;
+    aoiRectEl.style.width = `${width}px`;
+    aoiRectEl.style.height = `${height}px`;
+
+    const scale = Number(aoiScaleSelect.value) || 4;
+    const outW = Math.round(aoiBox.w * scale);
+    const outH = Math.round(aoiBox.h * scale);
+    aoiBadgeEl.textContent = `AOI: ${Math.round(aoiBox.w)}×${Math.round(aoiBox.h)}  •  PNG ${scale}×: ${outW}×${outH} px`;
+  }
+
+  function setAoiVisible(vis) {
+    aoiVisible = vis;
+    aoiToolbar.classList.toggle('visible', vis);
+    aoiOverlay.classList.toggle('visible', vis);
+    btnToggleAoi.classList.toggle('btn-primary', vis);
+    btnAoiCanvas.classList.toggle('active', vis);
+    if (!vis) {
+      setAoiDrawingMode(false);
+    } else {
+      if (!aoiCustom) fitAoiToDiagram();
+      updateAoiOverlayPosition();
+      const topPx = parseFloat(aoiRectEl.style.top || '0');
+      if (pz && topPx < 54) {
+        pz.panBy({ x: 0, y: 54 - topPx });
+        updateAoiOverlayPosition();
+      }
+    }
+  }
+
+  function setAoiDrawingMode(enabled) {
+    aoiDrawingMode = enabled;
+    aoiOverlay.classList.toggle('drawing-mode', enabled);
+    btnAoiDraw.classList.toggle('active', enabled);
+  }
+
   function updateZoomReadout() {
     if (!pz) return;
     zoomLabel.textContent = `${Math.round(pz.getZoom() * 100)}%`;
+    updateAoiOverlayPosition();
   }
 
   function resetView() {
@@ -1010,6 +1796,24 @@
     pz.center();
     pz.zoom(0.875);
     updateZoomReadout();
+  }
+
+  function computeTightDiagramBox(svgEl) {
+    let rawBox = null;
+    try {
+      const target = svgEl.querySelector('g.root') || svgEl;
+      const b = target.getBBox();
+      if (b && b.width > 0 && b.height > 0) {
+        rawBox = { x: b.x, y: b.y, width: b.width, height: b.height };
+      }
+    } catch (_) {}
+    if (!rawBox) {
+      const vb = (svgEl.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+      if (vb.length === 4 && vb.every(n => !Number.isNaN(n)) && vb[2] > 0 && vb[3] > 0) {
+        rawBox = { x: vb[0], y: vb[1], width: vb[2], height: vb[3] };
+      }
+    }
+    return rawBox || { x: 0, y: 0, width: 400, height: 400 };
   }
 
   async function renderDiagram(preserveViewport = true) {
@@ -1097,7 +1901,23 @@
         });
       });
 
+      // Klik langsung pada garis/panah di kanvas untuk memilih Target Garis
+      container.querySelectorAll('path.flowchart-link').forEach(pathEl => {
+        pathEl.style.cursor = 'pointer';
+        pathEl.style.pointerEvents = 'visibleStroke';
+        pathEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectEdgeFromPathId(pathEl.id || '');
+        });
+      });
+      refreshEdgeDropdown();
+
       const svgEl = container.querySelector('svg');
+
+      // Simpan SVG murni & bounding box fokus area diagram sebelum dimodifikasi svgPanZoom
+      lastCleanSvg = svgEl.cloneNode(true);
+      lastDiagramBox = computeTightDiagramBox(svgEl);
+
       pz = svgPanZoom(svgEl, {
         zoomEnabled: true,
         panEnabled: true,
@@ -1107,7 +1927,8 @@
         minZoom: 0.1,
         maxZoom: 20,
         zoomScaleSensitivity: 0.3,
-        onZoom: updateZoomReadout
+        onZoom: updateZoomReadout,
+        onPan: updateAoiOverlayPosition
       });
 
       if (isFirstRender || !preserveViewport || prevZoom === null) {
@@ -1117,6 +1938,12 @@
         pz.zoom(prevZoom);
         pz.pan(prevPan);
         updateZoomReadout();
+      }
+
+      if (!aoiCustom) {
+        fitAoiToDiagram();
+      } else {
+        updateAoiOverlayPosition();
       }
 
       errorBanner.classList.remove('visible');
@@ -1198,6 +2025,7 @@
   function loadMmdContent(content, name = 'diagram.mmd') {
     mermaidCode = content;
     fileNameInput.value = name;
+    aoiCustom = false;
     if (activeTab !== 'code') {
       document.querySelector('.tab-btn[data-tab="code"]').click();
     } else {
@@ -1295,12 +2123,15 @@
     } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') {
       e.preventDefault();
       document.getElementById('btn-load-mmd').click();
+    } else if (e.key === 'Escape' && aoiVisible) {
+      setAoiVisible(false);
     }
   });
 
   sampleSelect.addEventListener('change', () => {
     mermaidCode = SAMPLES[sampleSelect.value] || SAMPLES.christmas;
     fileNameInput.value = `${sampleSelect.value}.mmd`;
+    aoiCustom = false;
     if (activeTab === 'code') {
       editor.value = mermaidCode;
       updateLineNumbers();
@@ -1333,42 +2164,271 @@
     showToast('Kode Mermaid berhasil disalin!');
   };
 
-  document.getElementById('btn-download-svg').onclick = () => {
-    const svgEl = container.querySelector('svg');
-    if (!svgEl) return;
-    const blob = new Blob([svgEl.outerHTML], { type: 'image/svg+xml;charset=utf-8' });
+  // --- Interaksi Kotak Area of Interest (AOI) ---
+  btnToggleAoi.onclick = () => setAoiVisible(!aoiVisible);
+  btnAoiCanvas.onclick = () => setAoiVisible(!aoiVisible);
+  document.getElementById('btn-aoi-close').onclick = () => setAoiVisible(false);
+  document.getElementById('btn-aoi-fit').onclick = () => {
+    fitAoiToDiagram();
+    showToast('Kotak AOI dipaskan ke seluruh diagram');
+  };
+  btnAoiDraw.onclick = () => {
+    setAoiDrawingMode(!aoiDrawingMode);
+    if (aoiDrawingMode) showToast('Klik & tarik di kanvas untuk menggambar kotak AOI baru');
+  };
+
+  [aoiXInput, aoiYInput, aoiWInput, aoiHInput].forEach(inp => {
+    inp.addEventListener('input', () => {
+      aoiCustom = true;
+      aoiBox.x = Number(aoiXInput.value) || 0;
+      aoiBox.y = Number(aoiYInput.value) || 0;
+      aoiBox.w = Math.max(10, Number(aoiWInput.value) || 10);
+      aoiBox.h = Math.max(10, Number(aoiHInput.value) || 10);
+      updateAoiOverlayPosition();
+    });
+  });
+
+  aoiPadInput.addEventListener('input', () => {
+    if (!aoiCustom) fitAoiToDiagram();
+  });
+
+  aoiScaleSelect.addEventListener('change', updateAoiOverlayPosition);
+
+  let aoiDragState = null;
+
+  aoiRectEl.addEventListener('mousedown', (e) => {
+    if (aoiDrawingMode) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const handle = e.target.closest('.aoi-handle');
+    const mode = handle ? handle.dataset.dir : 'move';
+    const startSvg = panePointToSvg(
+      e.clientX - rightPane.getBoundingClientRect().left,
+      e.clientY - rightPane.getBoundingClientRect().top
+    );
+    aoiDragState = {
+      mode,
+      startSvg,
+      origBox: { ...aoiBox }
+    };
+  });
+
+  aoiOverlay.addEventListener('mousedown', (e) => {
+    if (!aoiDrawingMode) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const rect = rightPane.getBoundingClientRect();
+    const startSvg = panePointToSvg(e.clientX - rect.left, e.clientY - rect.top);
+    aoiCustom = true;
+    aoiBox = { x: startSvg.x, y: startSvg.y, w: 10, h: 10 };
+    syncAoiInputsAndOverlay();
+    aoiDragState = {
+      mode: 'draw',
+      startSvg,
+      origBox: { ...aoiBox }
+    };
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!aoiDragState) return;
+    const rect = rightPane.getBoundingClientRect();
+    const curSvg = panePointToSvg(e.clientX - rect.left, e.clientY - rect.top);
+    const dx = curSvg.x - aoiDragState.startSvg.x;
+    const dy = curSvg.y - aoiDragState.startSvg.y;
+    const b = aoiDragState.origBox;
+    const mode = aoiDragState.mode;
+    aoiCustom = true;
+
+    if (mode === 'move') {
+      aoiBox.x = b.x + dx;
+      aoiBox.y = b.y + dy;
+    } else if (mode === 'draw') {
+      const x1 = Math.min(aoiDragState.startSvg.x, curSvg.x);
+      const y1 = Math.min(aoiDragState.startSvg.y, curSvg.y);
+      const x2 = Math.max(aoiDragState.startSvg.x, curSvg.x);
+      const y2 = Math.max(aoiDragState.startSvg.y, curSvg.y);
+      aoiBox = { x: x1, y: y1, w: Math.max(10, x2 - x1), h: Math.max(10, y2 - y1) };
+    } else {
+      let x1 = b.x;
+      let y1 = b.y;
+      let x2 = b.x + b.w;
+      let y2 = b.y + b.h;
+      if (mode.includes('w')) x1 = Math.min(x2 - 10, b.x + dx);
+      if (mode.includes('e')) x2 = Math.max(x1 + 10, b.x + b.w + dx);
+      if (mode.includes('n')) y1 = Math.min(y2 - 10, b.y + dy);
+      if (mode.includes('s')) y2 = Math.max(y1 + 10, b.y + b.h + dy);
+      aoiBox = { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+    }
+    syncAoiInputsAndOverlay();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!aoiDragState) return;
+    if (aoiDragState.mode === 'draw') {
+      setAoiDrawingMode(false);
+    }
+    aoiDragState = null;
+  });
+
+  function getActiveExportBox() {
+    if (!aoiCustom && lastDiagramBox) {
+      const pad = Math.max(0, Number(aoiPadInput.value) || 0);
+      return {
+        x: lastDiagramBox.x - pad,
+        y: lastDiagramBox.y - pad,
+        w: Math.max(20, lastDiagramBox.width + pad * 2),
+        h: Math.max(20, lastDiagramBox.height + pad * 2)
+      };
+    }
+    return {
+      x: aoiBox.x,
+      y: aoiBox.y,
+      w: Math.max(10, aoiBox.w),
+      h: Math.max(10, aoiBox.h)
+    };
+  }
+
+  function getSelectedBgColor() {
+    const val = aoiBgSelect.value;
+    if (val === 'transparent') return null;
+    if (val === 'canvas') {
+      return rightPane.classList.contains('light-canvas') ? '#f8f9fb' : '#1b1b1f';
+    }
+    return val;
+  }
+
+  function inlineFontAwesomeIcons(liveSvg, clonedSvg) {
+    if (!liveSvg || !clonedSvg) return;
+    clonedSvg.querySelectorAll('foreignObject').forEach(fo => {
+      fo.setAttribute('overflow', 'visible');
+      fo.style.overflow = 'visible';
+      if (fo.firstElementChild) {
+        fo.firstElementChild.style.overflow = 'visible';
+      }
+    });
+    const liveIcons = liveSvg.querySelectorAll('i[class*="fa-"]');
+    const clonedIcons = clonedSvg.querySelectorAll('i[class*="fa-"]');
+    liveIcons.forEach((liveIcon, idx) => {
+      const targetIcon = clonedIcons[idx];
+      if (!targetIcon) return;
+      try {
+        const beforeStyle = window.getComputedStyle(liveIcon, '::before');
+        const rawContent = beforeStyle.content || '';
+        const glyph = rawContent.replace(/^["']|["']$/g, '');
+        if (!glyph || glyph === 'none') return;
+        const c = document.createElement('canvas');
+        c.width = 96;
+        c.height = 96;
+        const ctx = c.getContext('2d');
+        const weight = beforeStyle.fontWeight || '900';
+        const family = beforeStyle.fontFamily || '"Font Awesome 6 Free"';
+        const color = beforeStyle.color || window.getComputedStyle(liveIcon).color || '#ffffff';
+        ctx.font = `${weight} 68px ${family}`;
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(glyph, 48, 50);
+        const img = document.createElement('img');
+        img.src = c.toDataURL('image/png');
+        img.style.cssText = 'width:0.95em;height:0.95em;vertical-align:-0.12em;display:inline-block;margin:0;';
+        targetIcon.replaceWith(img);
+      } catch (_) {}
+    });
+  }
+
+  function exportSvgWithAoi() {
+    if (!lastCleanSvg) return;
+    const box = getActiveExportBox();
+    const bgColor = getSelectedBgColor();
+    const liveSvg = container.querySelector('svg');
+    const cloned = lastCleanSvg.cloneNode(true);
+    inlineFontAwesomeIcons(liveSvg, cloned);
+
+    cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    cloned.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    cloned.setAttribute('viewBox', `${box.x} ${box.y} ${box.w} ${box.h}`);
+    cloned.setAttribute('width', String(Math.round(box.w)));
+    cloned.setAttribute('height', String(Math.round(box.h)));
+    cloned.setAttribute('style', `max-width:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;${bgColor ? `background-color:${bgColor};` : ''}`);
+
+    if (bgColor) {
+      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bgRect.setAttribute('x', String(box.x));
+      bgRect.setAttribute('y', String(box.y));
+      bgRect.setAttribute('width', String(box.w));
+      bgRect.setAttribute('height', String(box.h));
+      bgRect.setAttribute('fill', bgColor);
+      cloned.insertBefore(bgRect, cloned.firstChild);
+    }
+
+    const svgData = new XMLSerializer().serializeToString(cloned);
+    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `${getBaseFileName()}.svg`;
     a.click();
-    showToast('SVG berhasil diunduh!');
-  };
+    showToast(`SVG berhasil diunduh (${Math.round(box.w)}×${Math.round(box.h)})!`);
+  }
 
-  document.getElementById('btn-download-png').onclick = () => {
-    const svgEl = container.querySelector('svg');
-    if (!svgEl) return;
-    const cloned = svgEl.cloneNode(true);
-    const box = svgEl.getBoundingClientRect();
-    cloned.setAttribute('width', box.width * 2);
-    cloned.setAttribute('height', box.height * 2);
+  function exportPngWithAoi() {
+    if (!lastCleanSvg) return;
+    const box = getActiveExportBox();
+    const userScale = Number(aoiScaleSelect.value) || 4;
+    const maxLongSide = 7680;
+    const longest = Math.max(box.w, box.h, 1);
+    let scale = userScale;
+    if (longest * scale > maxLongSide) {
+      scale = maxLongSide / longest;
+    }
+
+    const outW = Math.max(1, Math.round(box.w * scale));
+    const outH = Math.max(1, Math.round(box.h * scale));
+    const bgColor = getSelectedBgColor();
+
+    const liveSvg = container.querySelector('svg');
+    const cloned = lastCleanSvg.cloneNode(true);
+    inlineFontAwesomeIcons(liveSvg, cloned);
+
+    cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    cloned.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    cloned.setAttribute('viewBox', `${box.x} ${box.y} ${box.w} ${box.h}`);
+    cloned.setAttribute('width', String(outW));
+    cloned.setAttribute('height', String(outH));
+    cloned.setAttribute(
+      'style',
+      `width:${outW}px;height:${outH}px;max-width:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;${bgColor ? `background-color:${bgColor};` : ''}`
+    );
+
     const svgData = new XMLSerializer().serializeToString(cloned);
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = box.width * 2;
-      canvas.height = box.height * 2;
+      canvas.width = outW;
+      canvas.height = outH;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = rightPane.classList.contains('light-canvas') ? '#f8f9fb' : '#1b1b1f';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      if (bgColor) {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, outW, outH);
+      }
+      ctx.drawImage(img, 0, 0, outW, outH);
       const a = document.createElement('a');
       a.href = canvas.toDataURL('image/png');
       a.download = `${getBaseFileName()}.png`;
       a.click();
-      showToast('PNG berhasil diunduh!');
+      showToast(`PNG (${outW}×${outH} px • ${userScale}×) berhasil diunduh!`);
+    };
+    img.onerror = () => {
+      showToast('Gagal mengekspor PNG');
     };
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
-  };
+  }
+
+  document.getElementById('btn-download-svg').onclick = exportSvgWithAoi;
+  document.getElementById('btn-download-png').onclick = exportPngWithAoi;
+  document.getElementById('btn-aoi-svg').onclick = exportSvgWithAoi;
+  document.getElementById('btn-aoi-png').onclick = exportPngWithAoi;
 
   const safetyCheck = document.getElementById('safety-lock-check');
   const safetyGroup = document.getElementById('safety-group');
@@ -1437,6 +2497,7 @@
     const newWidth = Math.max(240, Math.min(window.innerWidth * 0.75, e.clientX - sidebarW));
     leftPane.style.width = `${newWidth}px`;
     pz?.resize();
+    updateAoiOverlayPosition();
   });
   window.addEventListener('mouseup', () => {
     if (!isDragging) return;
@@ -1445,7 +2506,10 @@
     document.body.style.cursor = '';
   });
 
-  window.addEventListener('resize', () => pz?.resize());
+  window.addEventListener('resize', () => {
+    pz?.resize();
+    updateAoiOverlayPosition();
+  });
 
   // Initial load (wait for local FontAwesome webfonts so icon widths are measured accurately)
   editor.value = mermaidCode;
